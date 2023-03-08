@@ -1,0 +1,165 @@
+const { expect } = require('chai');
+const { ethers } = require('hardhat');
+
+const tokens = (n) => {
+    return ethers.utils.parseUnits(n.toString(), 'ether')
+}
+
+describe('Escrow', () => {
+    let buyer, owner, inspector, lender
+    let franchise, escrow
+
+    beforeEach(async () => {
+        // Setup accounts
+        [buyer, owner, inspector, lender] = await ethers.getSigners()
+
+        // Deploy Real Estate
+        const Franchise = await ethers.getContractFactory('Franchise')
+        franchise = await Franchise.deploy()
+
+        // Mint 
+        // try to create 12 NFT's
+        let transaction = await franchise.connect(owner).mint("https://dulligans.mypinata.cloud/ipfs/QmZBa6eGpSN9STrNUg67fHtW7N9jq86eKvzxk6i7sTotD8")
+        await transaction.wait()
+
+        // Deploy Escrow
+        const Escrow = await ethers.getContractFactory('Escrow')
+        escrow = await Escrow.deploy(
+            franchise.address,
+            owner.address,
+            inspector.address,
+            lender.address
+        )
+
+        // Approve Property
+        transaction = await franchise.connect(owner).approve(escrow.address, 1)
+        await transaction.wait()
+
+        // List Property
+        transaction = await escrow.connect(owner).list(1, buyer.address, tokens(10), tokens(5))
+        await transaction.wait()
+    })
+
+    describe('Deployment', () => {
+        it('Returns NFT address', async () => {
+            const result = await escrow.nftAddress()
+            expect(result).to.be.equal(franchise.address)
+        })
+
+        it('Returns owner', async () => {
+            const result = await escrow.owner()
+            expect(result).to.be.equal(owner.address)
+        })
+
+        it('Returns inspector', async () => {
+            const result = await escrow.inspector()
+            expect(result).to.be.equal(inspector.address)
+        })
+
+        it('Returns lender', async () => {
+            const result = await escrow.lender()
+            expect(result).to.be.equal(lender.address)
+        })
+    })
+
+    describe('Listing', () => {
+        it('Updates as listed', async () => {
+            const result = await escrow.isListed(1)
+            expect(result).to.be.equal(true)
+        })
+
+        it('Returns buyer', async () => {
+            const result = await escrow.buyer(1)
+            expect(result).to.be.equal(buyer.address)
+        })
+
+        it('Returns purchase price', async () => {
+            const result = await escrow.purchasePrice(1)
+            expect(result).to.be.equal(tokens(10))
+        })
+
+        it('Returns escrow amount', async () => {
+            const result = await escrow.escrowAmount(1)
+            expect(result).to.be.equal(tokens(5))
+        })
+
+        it('Updates ownership', async () => {
+            expect(await franchise.ownerOf(1)).to.be.equal(escrow.address)
+        })
+    })
+
+    describe('Deposits', () => {
+        beforeEach(async () => {
+            const transaction = await escrow.connect(buyer).depositEarnest(1, { value: tokens(5) })
+            await transaction.wait()
+        })
+
+        it('Updates contract balance', async () => {
+            const result = await escrow.getBalance()
+            expect(result).to.be.equal(tokens(5))
+        })
+    })
+
+    describe('Inspection', () => {
+        beforeEach(async () => {
+            const transaction = await escrow.connect(inspector).updateInspectionStatus(1, true)
+            await transaction.wait()
+        })
+
+        it('Updates inspection status', async () => {
+            const result = await escrow.inspectionPassed(1)
+            expect(result).to.be.equal(true)
+        })
+    })
+
+    describe('Approval', () => {
+        beforeEach(async () => {
+            let transaction = await escrow.connect(buyer).approveSale(1)
+            await transaction.wait()
+
+            transaction = await escrow.connect(owner).approveSale(1)
+            await transaction.wait()
+
+            transaction = await escrow.connect(lender).approveSale(1)
+            await transaction.wait()
+        })
+
+        it('Updates approval status', async () => {
+            expect(await escrow.approval(1, buyer.address)).to.be.equal(true)
+            expect(await escrow.approval(1, owner.address)).to.be.equal(true)
+            expect(await escrow.approval(1, lender.address)).to.be.equal(true)
+        })
+    })
+
+    describe('Sale', () => {
+        beforeEach(async () => {
+            let transaction = await escrow.connect(buyer).depositEarnest(1, { value: tokens(5) })
+            await transaction.wait()
+
+            transaction = await escrow.connect(inspector).updateInspectionStatus(1, true)
+            await transaction.wait()
+
+            transaction = await escrow.connect(buyer).approveSale(1)
+            await transaction.wait()
+
+            transaction = await escrow.connect(owner).approveSale(1)
+            await transaction.wait()
+
+            transaction = await escrow.connect(lender).approveSale(1)
+            await transaction.wait()
+
+            await lender.sendTransaction({ to: escrow.address, value: tokens(5) })
+
+            transaction = await escrow.connect(owner).finalizeSale(1)
+            await transaction.wait()
+        })
+
+        it('Updates ownership', async () => {
+            expect(await franchise.ownerOf(1)).to.be.equal(buyer.address)
+        })
+
+        it('Updates balance', async () => {
+            expect(await escrow.getBalance()).to.be.equal(0)
+        })
+    })
+})
