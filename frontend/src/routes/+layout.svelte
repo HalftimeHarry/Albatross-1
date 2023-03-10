@@ -29,7 +29,7 @@
 
 <div class="app">
 	<Navbar {address} {balance} />
-	<div class="bg-cyan-800">
+	<div class="bg-black">
 		<header />
 		<main>
 			{#if isConneted}

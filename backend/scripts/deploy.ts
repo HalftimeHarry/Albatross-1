@@ -21,7 +21,7 @@ async function main() {
   const franchise = await Franchise.deploy();
   await franchise.deployed();
 
-  console.log(`Deployed Real Estate Contract at: ${franchise.address}`);
+  console.log(`Deployed Franchise Contract at: ${franchise.address}`);
   console.log(`Minting 12 properties...\n`);
 
   // Add 12 NFT's using this
