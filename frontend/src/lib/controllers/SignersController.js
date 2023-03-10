@@ -2,7 +2,7 @@ import SignersProvider from "/workspace/Albatross-1/frontend/src/lib/providers/s
 import { writable } from "svelte/store";
 
 const baseState = {
-    owner: "loading owner...",
+    seller: "loading seller...",
     lender: "loading lender...",
     inspector: "loading inspector..."
 }
@@ -23,10 +23,10 @@ class SignersController {
     }
   
     async #getSigners() {
-        const owner = await this.signersProvider?.escrowContract.getDulliger();
-        const lender = await this.signersProvider?.escrowContract.getDulligie();
-        const inspector = await this.signersProvider?.escrowContract.getVendor();
-        this.#signersStore.update(s => ({ ...s, owner, lender, inspector }))
+        const seller = await this.signersProvider?.escrowContract.getSeller();
+        const lender = await this.signersProvider?.escrowContract.getLender();
+        const inspector = await this.signersProvider?.escrowContract.getInspector();
+        this.#signersStore.update(s => ({ ...s, seller, lender, inspector }))
     }
 
 }

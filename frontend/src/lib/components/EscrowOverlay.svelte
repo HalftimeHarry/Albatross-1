@@ -24,9 +24,11 @@
 
 	let activeAcct = getActiveAccount();
 
+	console.log(activeAcct);
+
 	const { signers_store } = signersController;
 
-	$: ({ owner, lender, inspector } = $signers_store);
+	$: ({ buyer, seller, lender, inspector } = $signers_store);
 
 	let open = true;
 	isOverlayOpen.subscribe((value) => {
@@ -73,13 +75,14 @@
 						role="img"
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 320 512"
-						><path
+					>
+						<path
 							fill="currentColor"
 							d="M311.9 260.8L160 353.6 8 260.8 160 0l151.9 260.8zM160 383.4L8 290.6 160 512l152-221.4-152 92.8z"
-						/></svg
-					>
-					{#if activeAcct.toLowerCase() === owner.toLowerCase()}
-						Owner
+						/>
+					</svg>
+					{#if activeAcct.toLowerCase() === seller.toLowerCase()}
+						Seller
 					{:else if activeAcct.toLowerCase() === lender.toLowerCase()}
 						Lender
 					{:else if activeAcct.toLowerCase() === inspector.toLowerCase()}

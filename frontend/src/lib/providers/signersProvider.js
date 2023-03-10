@@ -17,7 +17,7 @@ class SignersProvider {
             address: escrow.address
         });
         return {
-            getOwner: async () => await contract.owner(),
+            getSeller: async () => await contract.seller(),
             getInspector: async () => await contract.inspector(),
             getLender: async () => await contract.lender()
         }

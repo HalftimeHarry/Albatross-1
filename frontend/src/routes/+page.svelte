@@ -2,7 +2,7 @@
 	import { crossfade, fade, fly } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import Card from '/workspace/Albatross-1/frontend/src/lib/components/Card.svelte';
-	import EthersProvider from '/workspace/Albatross-1/frontend/src/ethersProvider.js';
+	import EthersProvider from '../lib/providers/ethersProvider.js';
 	import escrowController from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
 	import franchiseController from '/workspace/Albatross-1/frontend/src/lib/controllers/FranchiseController.js';
 	import { onMount } from 'svelte';

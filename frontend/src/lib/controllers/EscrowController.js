@@ -1,4 +1,4 @@
-import EthersProvider from "/workspace/Albatross-1/frontend/src/ethersProvider.js";
+import EthersProvider from "/workspace/Albatross-1/frontend/src/lib/providers/ethersProvider.js";
 import { writable } from "svelte/store";
 
 

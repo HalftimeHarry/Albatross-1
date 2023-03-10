@@ -6,12 +6,12 @@ const tokens = (n) => {
 }
 
 describe('Escrow', () => {
-    let buyer, owner, inspector, lender
+    let buyer, seller, inspector, lender
     let franchise, escrow
 
     beforeEach(async () => {
         // Setup accounts
-        [buyer, owner, inspector, lender] = await ethers.getSigners()
+        [buyer, seller, inspector, lender] = await ethers.getSigners()
 
         // Deploy Real Estate
         const Franchise = await ethers.getContractFactory('Franchise')
@@ -19,24 +19,24 @@ describe('Escrow', () => {
 
         // Mint 
         // try to create 12 NFT's
-        let transaction = await franchise.connect(owner).mint("https://dulligans.mypinata.cloud/ipfs/QmZBa6eGpSN9STrNUg67fHtW7N9jq86eKvzxk6i7sTotD8")
+        let transaction = await franchise.connect(seller).mint("https://dulligans.mypinata.cloud/ipfs/QmZBa6eGpSN9STrNUg67fHtW7N9jq86eKvzxk6i7sTotD8")
         await transaction.wait()
 
         // Deploy Escrow
         const Escrow = await ethers.getContractFactory('Escrow')
         escrow = await Escrow.deploy(
             franchise.address,
-            owner.address,
+            seller.address,
             inspector.address,
             lender.address
         )
 
         // Approve Property
-        transaction = await franchise.connect(owner).approve(escrow.address, 1)
+        transaction = await franchise.connect(seller).approve(escrow.address, 1)
         await transaction.wait()
 
         // List Property
-        transaction = await escrow.connect(owner).list(1, buyer.address, tokens(10), tokens(5))
+        transaction = await escrow.connect(seller).list(1, buyer.address, tokens(10), tokens(5))
         await transaction.wait()
     })
 
@@ -46,9 +46,9 @@ describe('Escrow', () => {
             expect(result).to.be.equal(franchise.address)
         })
 
-        it('Returns owner', async () => {
-            const result = await escrow.owner()
-            expect(result).to.be.equal(owner.address)
+        it('Returns seller', async () => {
+            const result = await escrow.seller()
+            expect(result).to.be.equal(seller.address)
         })
 
         it('Returns inspector', async () => {
@@ -83,8 +83,8 @@ describe('Escrow', () => {
             expect(result).to.be.equal(tokens(5))
         })
 
-        it('Updates ownership', async () => {
-            expect(await franchise.ownerOf(1)).to.be.equal(escrow.address)
+        it('Updates sellership', async () => {
+            expect(await franchise.sellerOf(1)).to.be.equal(escrow.address)
         })
     })
 
@@ -117,7 +117,7 @@ describe('Escrow', () => {
             let transaction = await escrow.connect(buyer).approveSale(1)
             await transaction.wait()
 
-            transaction = await escrow.connect(owner).approveSale(1)
+            transaction = await escrow.connect(seller).approveSale(1)
             await transaction.wait()
 
             transaction = await escrow.connect(lender).approveSale(1)
@@ -126,7 +126,7 @@ describe('Escrow', () => {
 
         it('Updates approval status', async () => {
             expect(await escrow.approval(1, buyer.address)).to.be.equal(true)
-            expect(await escrow.approval(1, owner.address)).to.be.equal(true)
+            expect(await escrow.approval(1, seller.address)).to.be.equal(true)
             expect(await escrow.approval(1, lender.address)).to.be.equal(true)
         })
     })
@@ -142,7 +142,7 @@ describe('Escrow', () => {
             transaction = await escrow.connect(buyer).approveSale(1)
             await transaction.wait()
 
-            transaction = await escrow.connect(owner).approveSale(1)
+            transaction = await escrow.connect(seller).approveSale(1)
             await transaction.wait()
 
             transaction = await escrow.connect(lender).approveSale(1)
@@ -150,16 +150,62 @@ describe('Escrow', () => {
 
             await lender.sendTransaction({ to: escrow.address, value: tokens(5) })
 
-            transaction = await escrow.connect(owner).finalizeSale(1)
+            transaction = await escrow.connect(seller).finalizeSale(1)
             await transaction.wait()
         })
 
-        it('Updates ownership', async () => {
-            expect(await franchise.ownerOf(1)).to.be.equal(buyer.address)
+        it('Updates sellership', async () => {
+            expect(await franchise.sellerOf(1)).to.be.equal(buyer.address)
         })
 
         it('Updates balance', async () => {
             expect(await escrow.getBalance()).to.be.equal(0)
         })
     })
+    describe('Roles', () => {
+    it('Allows to set seller', async () => {
+        const newseller = await ethers.getSigner()
+        const transaction = await escrow.connect(seller).setseller(newseller.address)
+        await transaction.wait()
+
+        const result = await escrow.seller()
+        expect(result).to.be.equal(newseller.address)
+    })
+
+    it('Allows to set inspector', async () => {
+        const newInspector = await ethers.getSigner()
+        const transaction = await escrow.connect(seller).setInspector(newInspector.address)
+        await transaction.wait()
+
+        const result = await escrow.inspector()
+        expect(result).to.be.equal(newInspector.address)
+    })
+
+    it('Allows to set lender', async () => {
+        const newLender = await ethers.getSigner()
+        const transaction = await escrow.connect(seller).setLender(newLender.address)
+        await transaction.wait()
+
+        const result = await escrow.lender()
+        expect(result).to.be.equal(newLender.address)
+    })
+
+    it('Only allows seller to set seller', async () => {
+        const newseller = await ethers.getSigner()
+        const transaction = escrow.connect(buyer).setseller(newseller.address)
+        await expect(transaction).to.be.revertedWith('Only seller can call this method')
+    })
+
+    it('Only allows seller to set inspector', async () => {
+        const newInspector = await ethers.getSigner()
+        const transaction = escrow.connect(buyer).setInspector(newInspector.address)
+        await expect(transaction).to.be.revertedWith('Only seller can call this method')
+    })
+
+    it('Only allows seller to set lender', async () => {
+        const newLender = await ethers.getSigner()
+        const transaction = escrow.connect(buyer).setLender(newLender.address)
+        await expect(transaction).to.be.revertedWith('Only seller can call this method')
+    })
+})
 })
