@@ -83,8 +83,8 @@ describe('Escrow', () => {
             expect(result).to.be.equal(tokens(5))
         })
 
-        it('Updates sellership', async () => {
-            expect(await franchise.sellerOf(1)).to.be.equal(escrow.address)
+        it('Updates ownership', async () => {
+            expect(await franchise.ownerOf(1)).to.be.equal(escrow.address)
         })
     })
 
@@ -154,8 +154,8 @@ describe('Escrow', () => {
             await transaction.wait()
         })
 
-        it('Updates sellership', async () => {
-            expect(await franchise.sellerOf(1)).to.be.equal(buyer.address)
+        it('Updates ownership', async () => {
+            expect(await franchise.ownerOf(1)).to.be.equal(buyer.address)
         })
 
         it('Updates balance', async () => {
@@ -163,49 +163,46 @@ describe('Escrow', () => {
         })
     })
     describe('Roles', () => {
-    it('Allows to set seller', async () => {
-        const newseller = await ethers.getSigner()
-        const transaction = await escrow.connect(seller).setseller(newseller.address)
-        await transaction.wait()
+        it('Allows to set seller', async () => {
+            const newseller = await ethers.getSigner()
+            const transaction = await escrow.connect(seller).setSeller(newseller.address)
+            await transaction.wait()
 
-        const result = await escrow.seller()
-        expect(result).to.be.equal(newseller.address)
+            const result = await escrow.seller()
+            expect(result).to.be.equal(newseller.address)
+        })
+
+        it('Allows to set inspector', async () => {
+            const newInspector = await ethers.getSigner();
+            const transaction = await escrow.connect(seller).setInspector(newInspector.address);
+            await transaction.wait();
+        })
+
+        it('Allows to set lender', async () => {
+            const newLender = await ethers.getSigner()
+            const transaction = await escrow.connect(seller).setLender(newLender.address)
+            await transaction.wait()
+
+            const result = await escrow.lender()
+            expect(result).to.be.equal(newLender.address)
+        })
+
+        it('Only allows seller to set seller', async () => {
+            const newseller = await ethers.getSigner()
+            const transaction = escrow.connect(buyer).setSeller(newseller.address)
+            await expect(transaction).to.be.revertedWith('Only seller can call this method')
+        })
+
+        it('Only allows seller to set inspector', async () => {
+            const newInspector = await ethers.getSigner()
+            const transaction = escrow.connect(buyer).setInspector(newInspector.address)
+            await expect(transaction).to.be.revertedWith('Only seller can call this method')
+        })
+
+        it('Only allows seller to set lender', async () => {
+            const newLender = await ethers.getSigner()
+            const transaction = escrow.connect(buyer).setLender(newLender.address)
+            await expect(transaction).to.be.revertedWith('Only seller can call this method')
+        })
     })
-
-    it('Allows to set inspector', async () => {
-        const newInspector = await ethers.getSigner()
-        const transaction = await escrow.connect(seller).setInspector(newInspector.address)
-        await transaction.wait()
-
-        const result = await escrow.inspector()
-        expect(result).to.be.equal(newInspector.address)
-    })
-
-    it('Allows to set lender', async () => {
-        const newLender = await ethers.getSigner()
-        const transaction = await escrow.connect(seller).setLender(newLender.address)
-        await transaction.wait()
-
-        const result = await escrow.lender()
-        expect(result).to.be.equal(newLender.address)
-    })
-
-    it('Only allows seller to set seller', async () => {
-        const newseller = await ethers.getSigner()
-        const transaction = escrow.connect(buyer).setseller(newseller.address)
-        await expect(transaction).to.be.revertedWith('Only seller can call this method')
-    })
-
-    it('Only allows seller to set inspector', async () => {
-        const newInspector = await ethers.getSigner()
-        const transaction = escrow.connect(buyer).setInspector(newInspector.address)
-        await expect(transaction).to.be.revertedWith('Only seller can call this method')
-    })
-
-    it('Only allows seller to set lender', async () => {
-        const newLender = await ethers.getSigner()
-        const transaction = escrow.connect(buyer).setLender(newLender.address)
-        await expect(transaction).to.be.revertedWith('Only seller can call this method')
-    })
-})
 })
