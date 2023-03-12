@@ -45,15 +45,15 @@ contract Escrow {
         lender = _lender;
     }
 
-    function setseller(address payable _seller) public onlySeller {
+    function setSeller(address payable _seller) public onlySeller {
         seller = _seller;
     }
 
-    function setInspector(address _inspector) public onlyseller {
+    function setInspector(address _inspector) public onlySeller {
         inspector = _inspector;
     }
 
-    function setLender(address _lender) public onlyseller {
+    function setLender(address _lender) public onlySeller {
         lender = _lender;
     }
 
@@ -62,7 +62,7 @@ contract Escrow {
         address _buyer,
         uint256 _purchasePrice,
         uint256 _escrowAmount
-    ) public payable onlyseller {
+    ) public payable {
         // Transfer NFT from seller to this contract
         IERC721(nftAddress).transferFrom(msg.sender, address(this), _nftID);
 
