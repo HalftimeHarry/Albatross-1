@@ -6,12 +6,12 @@ const tokens = (n) => {
 }
 
 describe('Escrow', () => {
-    let buyer, seller, inspector, lender
+    let buyer, seller, inspector, lender, dao
     let franchise, escrow
 
     beforeEach(async () => {
         // Setup accounts
-        [buyer, seller, inspector, lender] = await ethers.getSigners()
+        [buyer, seller, inspector, lender, dao] = await ethers.getSigners()
 
         // Deploy Real Estate
         const Franchise = await ethers.getContractFactory('Franchise')
@@ -28,7 +28,8 @@ describe('Escrow', () => {
             franchise.address,
             seller.address,
             inspector.address,
-            lender.address
+            lender.address,
+            dao.address
         )
 
         // Approve Property
@@ -59,6 +60,11 @@ describe('Escrow', () => {
         it('Returns lender', async () => {
             const result = await escrow.lender()
             expect(result).to.be.equal(lender.address)
+        })
+
+        it('Returns dao', async () => {
+            const result = await escrow.dao()
+            expect(result).to.be.equal(dao.address)
         })
     })
 
@@ -141,6 +147,10 @@ describe('Escrow', () => {
 
             transaction = await escrow.connect(buyer).approveSale(1)
             await transaction.wait()
+
+            transaction = await escrow.connect(dao).approveSale(1)
+            await transaction.wait()
+
 
             transaction = await escrow.connect(seller).approveSale(1)
             await transaction.wait()

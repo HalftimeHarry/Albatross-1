@@ -10,6 +10,7 @@ contract Escrow {
     address payable public seller;
     address public inspector;
     address public lender;
+    address public dao;
 
     modifier onlyBuyer(uint256 _nftID) {
         require(msg.sender == buyer[_nftID], "Only buyer can call this method");
@@ -37,12 +38,14 @@ contract Escrow {
         address _nftAddress,
         address payable _seller,
         address _inspector,
-        address _lender
+        address _lender,
+        address _dao
     ) {
         nftAddress = _nftAddress;
         seller = _seller;
         inspector = _inspector;
         lender = _lender;
+        dao = _dao;
     }
 
     function setSeller(address payable _seller) public onlySeller {
@@ -55,6 +58,10 @@ contract Escrow {
 
     function setLender(address _lender) public onlySeller {
         lender = _lender;
+    }
+
+    function setDao(address _dao) public onlySeller {
+        dao = _dao;
     }
 
     function list(
@@ -101,6 +108,7 @@ contract Escrow {
         require(approval[_nftID][buyer[_nftID]]);
         require(approval[_nftID][seller]);
         require(approval[_nftID][lender]);
+        require(approval[_nftID][dao]);
         require(address(this).balance >= purchasePrice[_nftID]);
 
         isListed[_nftID] = false;
