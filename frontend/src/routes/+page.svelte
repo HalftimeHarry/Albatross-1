@@ -18,6 +18,7 @@
 	$: ({ eadd } = $escrow_store);
 	$: ({ nfts } = $franchise_store);
 
+
 	const ethersProvider = new EthersProvider();
 	let nfts = [];
 

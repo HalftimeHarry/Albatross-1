@@ -1,16 +1,30 @@
 <script>
-	import { fade } from 'svelte/transition';
-	import { isOverlayOpen } from '/workspace/Albatross-1/frontend/src/lib/providers/overlayProvider.js';
-	import EscrowOverlay from '/workspace/Albatross-1/frontend/src/lib/components/EscrowOverlay.svelte';
+  import { fade } from 'svelte/transition';
+  import { isOverlayOpen } from '/workspace/Albatross-1/frontend/src/lib/providers/overlayProvider.js';
+  import EscrowOverlay from '/workspace/Albatross-1/frontend/src/lib/components/EscrowOverlay.svelte';
+  import ProgressBar from '/workspace/Albatross-1/frontend/src/lib/components/ProgressBar.svelte';
+  import { fundingProgress } from '/workspace/Albatross-1/frontend/src/lib/providers/progressBarProvider.js';
+  import { onMount } from 'svelte';
+  
+  export let name;
+  export let image;
+  export let area;
 
-	export let name;
-	export let image;
-	export let area;
+  let progress = 0;
+
+  onMount(async () => {
+    await progressBarController.init();
+  });
+
+  fundingProgress.subscribe(value => {
+    progress = value;
+  });
 </script>
 
-<div
-	class="max-w-sm bg-white border border-blue-700 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700"
->
+<div class="max-w-sm bg-white border border-blue-700 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
+  <p class="ml-4 mt-2 text-center font-sans text-cyan-800 font-bold">Funding Progress Bar</p>
+  <div class="mt-4">
+    <ProgressBar progress={progress} /></div>
 	<img class="rounded-t-lg" src={image} alt={name} />
 	<div class="p-5">
 		<h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">

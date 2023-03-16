@@ -24,7 +24,6 @@
 
 	let activeAcct = getActiveAccount();
 
-	console.log(activeAcct);
 
 	const { signers_store } = signersController;
 
