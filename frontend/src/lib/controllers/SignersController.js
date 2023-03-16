@@ -4,7 +4,8 @@ import { writable } from "svelte/store";
 const baseState = {
     seller: "loading seller...",
     lender: "loading lender...",
-    inspector: "loading inspector..."
+    inspector: "loading inspector...",
+    dao: "loading dao..."
 }
 
 
@@ -26,7 +27,8 @@ class SignersController {
         const seller = await this.signersProvider?.escrowContract.getSeller();
         const lender = await this.signersProvider?.escrowContract.getLender();
         const inspector = await this.signersProvider?.escrowContract.getInspector();
-        this.#signersStore.update(s => ({ ...s, seller, lender, inspector }))
+        const dao = await this.signersProvider?.escrowContract.getDAO();
+      this.#signersStore.set({ seller, lender, inspector, dao });
     }
 
 }

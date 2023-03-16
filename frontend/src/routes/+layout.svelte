@@ -49,9 +49,9 @@
 				<div class="flex justify-between">
 					<div class="text-gray-400">RFID Crypto Demo © 2023</div>
 					<div>
-						<a href="#" class="text-gray-400 hover:text-white"> Privacy Policy </a>
+						<a href="/privacy" class="text-gray-400 hover:text-white"> Privacy Policy </a>
 						<span class="text-gray-400 mx-2">|</span>
-						<a href="#" class="text-gray-400 hover:text-white"> Terms of Use </a>
+						<a href="/terms" class="text-gray-400 hover:text-white"> Terms of Use </a>
 					</div>
 				</div>
 			</div>

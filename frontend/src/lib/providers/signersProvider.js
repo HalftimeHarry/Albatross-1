@@ -19,7 +19,8 @@ class SignersProvider {
         return {
             getSeller: async () => await contract.seller(),
             getInspector: async () => await contract.inspector(),
-            getLender: async () => await contract.lender()
+            getLender: async () => await contract.lender(),
+            getDAO: async () => await contract.dao(),
         }
     }
 }
