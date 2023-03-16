@@ -14,7 +14,7 @@ const tokens = (n) => {
 
 async function main() {
   // Setup accounts
-  const [buyer, owner, inspector, lender] = await ethers.getSigners();
+  const [buyer, owner, inspector, lender, dao] = await ethers.getSigners();
 
   // Deploy Real Estate
   const Franchise = await ethers.getContractFactory('Franchise');
@@ -38,7 +38,8 @@ async function main() {
     franchise.address,
     owner.address,
     inspector.address,
-    lender.address
+    lender.address,
+    dao.address
   );
   await escrow.deployed();
 

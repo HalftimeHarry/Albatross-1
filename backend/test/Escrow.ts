@@ -104,19 +104,24 @@ describe('Escrow', () => {
             const result = await escrow.getBalance()
             expect(result).to.be.equal(tokens(5))
         })
-    })
 
-    describe('Inspection', () => {
-        beforeEach(async () => {
-            const transaction = await escrow.connect(inspector).updateInspectionStatus(1, true)
-            await transaction.wait()
-        })
-
-        it('Updates inspection status', async () => {
-            const result = await escrow.inspectionPassed(1)
-            expect(result).to.be.equal(true)
+        it('Reaches goal amount', async () => {
+            const result = await escrow.getBalance()
+            expect(result).to.be.equal(tokens(5))
         })
     })
+
+        describe('Inspection', () => {
+            beforeEach(async () => {
+                const transaction = await escrow.connect(inspector).updateInspectionStatus(1, true)
+                await transaction.wait()
+            })
+
+            it('Updates inspection status', async () => {
+                const result = await escrow.inspectionPassed(1)
+                expect(result).to.be.equal(true)
+            })
+        })
 
     describe('Approval', () => {
         beforeEach(async () => {
@@ -164,13 +169,27 @@ describe('Escrow', () => {
             await transaction.wait()
         })
 
-        it('Updates ownership', async () => {
-            expect(await franchise.ownerOf(1)).to.be.equal(buyer.address)
+        it('Updates ownership to DAO', async () => {
+            expect(await franchise.ownerOf(1)).to.be.equal(dao.address)
         })
 
         it('Updates balance', async () => {
             expect(await escrow.getBalance()).to.be.equal(0)
         })
+
+        it('Returns additional funds after reaching goal amount', async () => {
+        let transaction = await escrow.connect(buyer).depositEarnest(1, { value: tokens(5) });
+        await transaction.wait();
+
+        transaction = await escrow.connect(buyer).depositEarnest(1, { value: tokens(6) });
+        await transaction.wait();
+
+        const buyerBalance = await buyer.getBalance();
+        const escrowBalance = await escrow.getBalance();
+
+        expect(escrowBalance).to.be.equal(tokens(11));
+        expect(buyerBalance).to.be.gt(tokens(6));
+    })
     })
     describe('Roles', () => {
         it('Allows to set seller', async () => {

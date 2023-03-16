@@ -33,6 +33,9 @@ contract Escrow {
     mapping(uint256 => address) public buyer;
     mapping(uint256 => bool) public inspectionPassed;
     mapping(uint256 => mapping(address => bool)) public approval;
+    mapping(uint256 => uint256) public goalAmount;
+    mapping(uint256 => uint256) public currentDeposit;
+    mapping(uint256 => mapping(address => uint256)) public buyerDeposit;
 
     constructor(
         address _nftAddress,
@@ -46,6 +49,13 @@ contract Escrow {
         inspector = _inspector;
         lender = _lender;
         dao = _dao;
+    }
+
+    function setGoalAmount(
+        uint256 _nftID,
+        uint256 _goalAmount
+    ) public onlySeller {
+        goalAmount[_nftID] = _goalAmount;
     }
 
     function setSeller(address payable _seller) public onlySeller {
@@ -80,8 +90,29 @@ contract Escrow {
     }
 
     // Put Under Contract (only buyer - payable escrow)
-    function depositEarnest(uint256 _nftID) public payable onlyBuyer(_nftID) {
-        require(msg.value >= escrowAmount[_nftID]);
+    function depositEarnest(uint256 _nftID) public payable {
+        // Set goal amount to 6
+        uint256 goal = 50000000000000000000;
+        goalAmount[_nftID] = goal;
+
+        require(
+            currentDeposit[_nftID] < goalAmount[_nftID],
+            "Goal amount already reached"
+        );
+
+        uint256 remaining = goalAmount[_nftID] - currentDeposit[_nftID];
+        uint256 contribution;
+
+        if (msg.value > remaining) {
+            contribution = remaining;
+            uint256 refund = msg.value - remaining;
+            payable(msg.sender).transfer(refund);
+        } else {
+            contribution = msg.value;
+        }
+
+        currentDeposit[_nftID] += contribution;
+        buyerDeposit[_nftID][msg.sender] += contribution;
     }
 
     // Update Inspection Status (only inspector)
@@ -118,7 +149,7 @@ contract Escrow {
         );
         require(success);
 
-        IERC721(nftAddress).transferFrom(address(this), buyer[_nftID], _nftID);
+        IERC721(nftAddress).transferFrom(address(this), dao, _nftID);
     }
 
     // Cancel Sale (handle earnest deposit)
