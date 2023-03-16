@@ -24,10 +24,11 @@
 
 	let activeAcct = getActiveAccount();
 
+	console.log(activeAcct);
 
 	const { signers_store } = signersController;
 
-	$: ({ buyer, seller, lender, inspector } = $signers_store);
+	$: ({ seller, lender, inspector, dao } = $signers_store);
 
 	let open = true;
 	isOverlayOpen.subscribe((value) => {
@@ -35,7 +36,7 @@
 	});
 	export let name;
 	export let image;
-	export let description;
+	export let area;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -60,7 +61,7 @@
 				>
 				<h5>{name}</h5>
 				<img src={image} alt={name} />
-				<p>{description}</p>
+				<p>{area}</p>
 				<button
 					type="button"
 					class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
@@ -86,6 +87,10 @@
 						Lender
 					{:else if activeAcct.toLowerCase() === inspector.toLowerCase()}
 						Inspector
+					{:else if activeAcct.toLowerCase() === dao.toLowerCase()}
+						DAO
+					{:else}
+						Fund Franchise
 					{/if}
 				</button>
 			</div>

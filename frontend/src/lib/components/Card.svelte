@@ -6,19 +6,18 @@
   import { fundingProgress } from '/workspace/Albatross-1/frontend/src/lib/providers/progressBarProvider.js';
   import { onMount } from 'svelte';
   
-  export let name;
-  export let image;
-  export let area;
-
-  let progress = 0;
-
-  onMount(async () => {
-    await progressBarController.init();
-  });
-
-  fundingProgress.subscribe(value => {
-    progress = value;
-  });
+  
+	export let name;
+	export let image;
+	export let area;
+	let progress = 0;
+	
+	onMount(async () => {
+		await progressBarController.init();
+	});
+	fundingProgress.subscribe(value => {
+		progress = value;
+	});
 </script>
 
 <div class="max-w-sm bg-white border border-blue-700 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
