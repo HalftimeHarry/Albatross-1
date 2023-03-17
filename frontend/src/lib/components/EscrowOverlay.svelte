@@ -5,6 +5,7 @@
 	import signersController from '/workspace/Albatross-1/frontend/src/lib/controllers/SignersController.js';
 	import MetamaskController from '/workspace/Albatross-1/frontend/src/lib/controllers/MetamaskController.js';
 	import { writable } from 'svelte/store';
+	import escrowController from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
 
 	let activeAccount = writable(null);
 
@@ -24,8 +25,6 @@
 
 	let activeAcct = getActiveAccount();
 
-	console.log(activeAcct);
-
 	const { signers_store } = signersController;
 
 	$: ({ seller, lender, inspector, dao } = $signers_store);
@@ -37,6 +36,29 @@
 	export let name;
 	export let image;
 	export let area;
+	export let nftID;
+
+	const handleClick = async () => {
+		const activeAcct = getActiveAccount();
+
+		if (activeAcct.toLowerCase() === seller.toLowerCase()) {
+			// execute seller function
+			console.log('Seller clicked the button');
+		} else if (activeAcct.toLowerCase() === lender.toLowerCase()) {
+			// execute lender function
+			console.log('Lender clicked the button');
+		} else if (activeAcct.toLowerCase() === inspector.toLowerCase()) {
+			// execute inspector function
+			console.log('Inspector clicked the button');
+		} else if (activeAcct.toLowerCase() === dao.toLowerCase()) {
+			// execute DAO function
+			console.log('DAO clicked the button');
+		} else {
+			// execute buyer function
+			console.log('Buyer clicked the button');
+			await escrowController.buyersDepositEarnest(nftID, activeAcct);
+		}
+	};
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -64,7 +86,8 @@
 				<p>{area}</p>
 				<button
 					type="button"
-					class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
+					class="mt-4 text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
+					on:click={() => handleClick(activeAcct)}
 				>
 					<svg
 						class="w-4 h-4 mr-2 -ml-1 text-[#626890]"
