@@ -18,13 +18,17 @@ class EthersProvider {
       abi: escrowAbi.abi,
       address: escrowAbi.address
     });
-     return {
+    return {
       getFundingProgress: async (nftID) => {
         const currentDeposit = await contract.currentDeposit(nftID);
         const goalAmount = await contract.goalAmount(nftID);
         return currentDeposit.mul(100).div(goalAmount);
       },
-      getEadd: async () => await contract.inspector()
+      getEadd: async () => await contract.inspector(),
+      buyerDepositEarnest: async (nftID, value) => {
+        const tx = await contract.connect(this.signer).depositEarnest(nftID, { value });
+        await tx.wait();
+      }
     };
   }
 
