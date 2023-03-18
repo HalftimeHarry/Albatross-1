@@ -55,9 +55,8 @@
 			console.log('DAO clicked the button');
 		} else {
 			// execute buyer function
-			console.log(nftID);
 			const currAcct = activeAcct.toLowerCase();
-			await escrowController.buyersDepositEarnest(nftID, currAcct,1);
+			await escrowController.buyersDepositEarnest(nftID, currAcct, 0);
 		}
 	};
 </script>

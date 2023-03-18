@@ -91,8 +91,8 @@ contract Escrow {
 
     // Put Under Contract (only buyer - payable escrow)
     function depositEarnest(uint256 _nftID) public payable {
-        // Set goal amount to 6
-        uint256 goal = 50000000000000000000;
+        // Set goal amount to 5
+        uint256 goal = 1000000000000000000;
         goalAmount[_nftID] = goal;
 
         require(
