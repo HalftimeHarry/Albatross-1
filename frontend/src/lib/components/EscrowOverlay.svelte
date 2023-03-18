@@ -55,8 +55,9 @@
 			console.log('DAO clicked the button');
 		} else {
 			// execute buyer function
-			console.log('Buyer clicked the button');
-			await escrowController.buyersDepositEarnest(nftID, activeAcct);
+			console.log(nftID);
+			const currAcct = activeAcct.toLowerCase();
+			await escrowController.buyersDepositEarnest(nftID, currAcct,1);
 		}
 	};
 </script>
@@ -113,7 +114,7 @@
 					{:else if activeAcct.toLowerCase() === dao.toLowerCase()}
 						DAO
 					{:else}
-						Fund Franchise
+						Fund Franchise {nftID}
 					{/if}
 				</button>
 			</div>
