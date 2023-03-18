@@ -7,6 +7,7 @@
 	import franchiseController from '/workspace/Albatross-1/frontend/src/lib/controllers/FranchiseController.js';
 	import { onMount } from 'svelte';
 
+
 	onMount(async () => {
 		await escrowController.init();
 		await franchiseController.init();
@@ -65,7 +66,7 @@
 		<div class="grid gap-2 md:grid-cols-3" in:fly={{ y: 200, duration: 2000 }} out:fade>
 			{#each nfts as nft}
 				{#if nft.name && nft.image && nft.area && nft.id}
-					<Card name={nft.name} image={nft.image} area={nft.area} />
+					<Card name={nft.name} image={nft.image} area={nft.area} nftID={nft.id}/>
 				{/if}
 			{/each}
 		</div>
