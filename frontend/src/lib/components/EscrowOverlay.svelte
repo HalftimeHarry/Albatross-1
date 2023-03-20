@@ -5,7 +5,7 @@
 	import signersController from '/workspace/Albatross-1/frontend/src/lib/controllers/SignersController.js';
 	import MetamaskController from '/workspace/Albatross-1/frontend/src/lib/controllers/MetamaskController.js';
 	import { writable } from 'svelte/store';
-	import escrowController from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
+	import FundFranchise from '/workspace/Albatross-1/frontend/src/lib/components/FundFranchise.svelte';
 
 	let activeAccount = writable(null);
 
@@ -54,9 +54,14 @@
 			// execute DAO function
 			console.log('DAO clicked the button');
 		} else {
-			// execute buyer function
-			const currAcct = activeAcct.toLowerCase();
-			await escrowController.buyersDepositEarnest(nftID, currAcct, 0);
+			// display FundFranchise component for buyer
+			const FundFranchise = (await import('./FundFranchise.svelte')).default;
+			new FundFranchise({
+				target: document.body,
+				props: {
+					nftID
+				}
+			});
 		}
 	};
 </script>
@@ -89,21 +94,6 @@
 					class="mt-4 text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
 					on:click={() => handleClick(activeAcct)}
 				>
-					<svg
-						class="w-4 h-4 mr-2 -ml-1 text-[#626890]"
-						aria-hidden="true"
-						focusable="false"
-						data-prefix="fab"
-						data-icon="ethereum"
-						role="img"
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 320 512"
-					>
-						<path
-							fill="currentColor"
-							d="M311.9 260.8L160 353.6 8 260.8 160 0l151.9 260.8zM160 383.4L8 290.6 160 512l152-221.4-152 92.8z"
-						/>
-					</svg>
 					{#if activeAcct.toLowerCase() === seller.toLowerCase()}
 						Seller
 					{:else if activeAcct.toLowerCase() === lender.toLowerCase()}
@@ -113,7 +103,11 @@
 					{:else if activeAcct.toLowerCase() === dao.toLowerCase()}
 						DAO
 					{:else}
-						Fund Franchise {nftID}
+						<FundFranchise
+							{nftID}
+							on:close={() => isOverlayOpen.set(false)}
+							on:fund={() => handleClick(activeAcct)}
+						/>
 					{/if}
 				</button>
 			</div>

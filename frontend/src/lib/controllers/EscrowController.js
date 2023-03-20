@@ -20,10 +20,10 @@ class EscrowController{
     this.#nftAddress();
   }
 
-  async buyersDepositEarnest(nftId, value) {
-    const transaction = await this.ethersProvider?.escrowContract.buyerDepositEarnest(nftId, value);
-        await transaction.wait();
-    }
+  async buyersDepositEarnest(nftId, amount) {
+      const transactionReceipt = await this.ethersProvider?.escrowContract.buyerDepositEarnest(nftId, { amount });
+      return transactionReceipt;
+  }
   
   async #nftAddress(){
     const eadd = await this.ethersProvider?.escrowContract.getEadd();
