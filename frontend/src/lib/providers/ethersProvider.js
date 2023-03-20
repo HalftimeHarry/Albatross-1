@@ -25,9 +25,11 @@ class EthersProvider {
         return currentDeposit.mul(100).div(goalAmount);
       },
       getEadd: async () => await contract.inspector(),
-      buyerDepositEarnest: async (nftID, { value }) => {
-        const tx = await contract.connect(this.signer).depositEarnest(nftID, { value });
-        await tx.wait();
+      buyerDepositEarnest: async (nftID, { amount }) => {
+        const amountInWei = ethers.utils.parseUnits(amount.toString(), 'ether');
+        const tx = await contract.connect(this.signer).depositEarnest(nftID, { value: amountInWei });
+        const receipt = await tx.wait();
+        return receipt;
       }
     };
   }
