@@ -33,7 +33,7 @@
 	"type": "module",
 	"dependencies": {
 		"daisyui": "^2.51.3",
-		"ethers": "5.5.4",
+		"ethers": "^5.7.2",
 		"web3": "^1.8.2"
 	}
 }
