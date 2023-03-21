@@ -51,6 +51,10 @@ contract Escrow {
         dao = _dao;
     }
 
+    fallback() external payable {
+        // handle unknown function selector
+    }
+
     function setGoalAmount(
         uint256 _nftID,
         uint256 _goalAmount
@@ -92,7 +96,7 @@ contract Escrow {
     // Put Under Contract (only buyer - payable escrow)
     function depositEarnest(uint256 _nftID) public payable {
         // Set goal amount to 5
-        uint256 goal = 1000000000000000000;
+        uint256 goal = 9000000000000000000;
         goalAmount[_nftID] = goal;
 
         require(
