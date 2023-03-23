@@ -4,21 +4,40 @@
 	import EscrowOverlay from '/workspace/Albatross-1/frontend/src/lib/components/EscrowOverlay.svelte';
 	import ProgressBar from '/workspace/Albatross-1/frontend/src/lib/components/ProgressBar.svelte';
 	import { fundingProgress } from '/workspace/Albatross-1/frontend/src/lib/providers/progressBarProvider.js';
-	// import progressBarController from '/workspace/Albatross-1/frontend/src/lib/controllers/ProgressBarController.js';
 	import { onMount } from 'svelte';
+	import EthersProvider from '/workspace/Albatross-1/frontend/src/lib/providers/ethersProvider.js';
+	import EscrowController from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
 
 	export let name;
 	export let image;
 	export let area;
 	export let nftID;
 
-	let progress = 0;
+	let deposit = 0;
+
+	const ethersProvider = new EthersProvider();
+
+	let nftArray = [];
+
+	async function getProgress(nftID) {
+		const progress = await ethersProvider?.escrowContract.getFundingProgress(nftID);
+		let deposit = progress.toString(10);
+
+		// find the NFT in the array and update its deposit value
+		const index = nftArray.findIndex((nft) => nft.id === nftID);
+		nftArray[index].deposit = deposit;
+
+		EscrowController.escrowStore((s) => ({ ...s, deposit }));
+	}
 
 	onMount(async () => {
-		await progressBarController.init();
+		// add the NFT to the array
+		nftArray.push({ id: nftID, deposit: 0 });
+
+		await getProgress(nftID);
 	});
 	fundingProgress.subscribe((value) => {
-		progress = value;
+		deposit = value;
 	});
 </script>
 
@@ -27,7 +46,9 @@
 >
 	<p class="ml-4 mt-2 text-center font-sans text-cyan-800 font-bold">Funding Progress Bar</p>
 	<div class="mt-4">
-		<ProgressBar {progress} />
+		{#each nftArray as nft}
+			<ProgressBar progress={nft.deposit} />;
+		{/each}
 	</div>
 	<img class="rounded-t-lg" src={image} alt={name} />
 	<div class="p-5">
@@ -55,7 +76,7 @@
 				});
 			}}
 		>
-			Next
+			Fund
 			<svg
 				aria-hidden="true"
 				class="w-4 h-4 ml-2 -mr-1"

@@ -3,7 +3,8 @@ import { writable } from "svelte/store";
 
 
 const baseState={
-  eadd: "loading nft address..."
+  eadd: "loading nft address...",
+  deposit: "deposits ..."
 }
 
 class EscrowController{
@@ -18,12 +19,24 @@ class EscrowController{
   async init() {
     this.ethersProvider = new EthersProvider();
     this.#nftAddress();
+    this.getProgress();
+    this.approveSale();
   }
 
   async buyersDepositEarnest(nftId, amount) {
       const transactionReceipt = await this.ethersProvider?.escrowContract.buyerDepositEarnest(nftId, { amount });
       return transactionReceipt;
   }
+
+  async getProgress() {
+    const deposit = await this.ethersProvider?.escrowContract.getFundingProgress(nftID);
+    this.#escrowStore.update((s) => ({ ...s, deposit }));
+  }
+
+  async approveSale(nftID) {
+      const transaction = await this.ethersProvider?.escrowContract.approveSale(nftID);
+      await transaction.wait();
+    }
   
   async #nftAddress(){
     const eadd = await this.ethersProvider?.escrowContract.getEadd();

@@ -6,6 +6,7 @@
 	import MetamaskController from '/workspace/Albatross-1/frontend/src/lib/controllers/MetamaskController.js';
 	import { writable } from 'svelte/store';
 	import FundFranchise from '/workspace/Albatross-1/frontend/src/lib/components/FundFranchise.svelte';
+	import ApproveSale from '/workspace/Albatross-1/frontend/src/lib/components/ApproveSale.svelte';
 
 	let activeAccount = writable(null);
 
@@ -43,7 +44,13 @@
 
 		if (activeAcct.toLowerCase() === seller.toLowerCase()) {
 			// execute seller function
-			console.log('Seller clicked the button');
+			const ApproveSale = (await import('./ApproveSale.svelte')).default;
+			new ApproveSale({
+				target: document.body,
+				props: {
+					nftID
+				}
+			});
 		} else if (activeAcct.toLowerCase() === lender.toLowerCase()) {
 			// execute lender function
 			console.log('Lender clicked the button');
@@ -95,13 +102,33 @@
 					on:click={() => handleClick(activeAcct)}
 				>
 					{#if activeAcct.toLowerCase() === seller.toLowerCase()}
-						Seller
+						<div class="mr-3 mt-4">Seller Approval</div>
+						<ApproveSale
+							{nftID}
+							on:close={() => isOverlayOpen.set(false)}
+							on:fund={() => handleClick(activeAcct)}
+						/>
 					{:else if activeAcct.toLowerCase() === lender.toLowerCase()}
-						Lender
+						<div class="mr-3 mt-4">Lender Approval</div>
+						<ApproveSale
+							{nftID}
+							on:close={() => isOverlayOpen.set(false)}
+							on:fund={() => handleClick(activeAcct)}
+						/>
 					{:else if activeAcct.toLowerCase() === inspector.toLowerCase()}
-						Inspector
+						<div class="mr-3 mt-4">Inspector Approval</div>
+						<ApproveSale
+							{nftID}
+							on:close={() => isOverlayOpen.set(false)}
+							on:fund={() => handleClick(activeAcct)}
+						/>
 					{:else if activeAcct.toLowerCase() === dao.toLowerCase()}
-						DAO
+						<div class="mr-3 mt-4">DAO Approval</div>
+						<ApproveSale
+							{nftID}
+							on:close={() => isOverlayOpen.set(false)}
+							on:fund={() => handleClick(activeAcct)}
+						/>
 					{:else}
 						<FundFranchise
 							{nftID}

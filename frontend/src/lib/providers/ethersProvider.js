@@ -2,7 +2,6 @@ import { ethers } from "ethers";
 import escrowAbi from "/workspace/Albatross-1/backend/artifacts/contracts/Escrow.sol/Escrow.json";
 import franchiseAbi from "/workspace/Albatross-1/backend/artifacts/contracts/Franchise.sol/Franchise.json";
 
-console.log(escrowAbi);
 
 
 class EthersProvider {
@@ -24,7 +23,14 @@ class EthersProvider {
       getFundingProgress: async (nftID) => {
         const currentDeposit = await contract.currentDeposit(nftID);
         const goalAmount = await contract.goalAmount(nftID);
+        if (goalAmount.eq(0)) {
+          return 0;
+        }
         return currentDeposit.mul(100).div(goalAmount);
+      },
+      approveSale: async (nftID) => {
+        const transaction = await contract.connect(this.signer).approveSale(nftID);
+        await transaction.wait();
       },
       getEadd: async () => await contract.inspector(),
       buyerDepositEarnest: async (nftID, { amount }) => {
