@@ -2,7 +2,6 @@ import { ethers } from "ethers";
 import escrowAbi from "/workspace/Albatross-1/backend/artifacts/contracts/Escrow.sol/Escrow.json";
 import franchiseAbi from "/workspace/Albatross-1/backend/artifacts/contracts/Franchise.sol/Franchise.json";
 
-console.log(escrowAbi);
 
 
 class EthersProvider {

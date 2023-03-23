@@ -16,7 +16,7 @@
 	const { escrow_store } = escrowController;
 	const { franchise_store } = franchiseController;
 
-	$: ({ eadd } = $escrow_store);
+	$: ({ eadd, deposit } = $escrow_store);
 	$: ({ nfts } = $franchise_store);
 
 
@@ -53,6 +53,7 @@
 		out:fade
 	>
 		{eadd}
+		{deposit}
 	</h1>
 	<p
 		class="mb-6 text-lg font-normal text-white lg:text-xl sm:px-16 xl:px-48"
