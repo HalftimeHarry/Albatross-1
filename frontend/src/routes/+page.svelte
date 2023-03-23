@@ -16,7 +16,7 @@
 	const { escrow_store } = escrowController;
 	const { franchise_store } = franchiseController;
 
-	$: ({ eadd, deposit } = $escrow_store);
+	$: ({ eadd } = $escrow_store);
 	$: ({ nfts } = $franchise_store);
 
 
@@ -52,15 +52,15 @@
 		in:fly={{ y: 200, duration: 2000 }}
 		out:fade
 	>
-		{eadd}
-		{deposit}
+		 <!--.{eadd}. To debug let this prit if there is an address its conected --> 
+		 Albatross Franchise Listings
 	</h1>
 	<p
 		class="mb-6 text-lg font-normal text-white lg:text-xl sm:px-16 xl:px-48"
 		in:fly={{ y: 200, duration: 2000 }}
 		out:fade
 	>
-		Fix
+		Fund a franchise become an owner in our leauge!
 	</p>
 
 	{#if nfts}

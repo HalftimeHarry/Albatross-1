@@ -20,6 +20,7 @@ class EscrowController{
     this.ethersProvider = new EthersProvider();
     this.#nftAddress();
     this.getProgress();
+    this.approveSale();
   }
 
   async buyersDepositEarnest(nftId, amount) {
@@ -31,6 +32,11 @@ class EscrowController{
     const deposit = await this.ethersProvider?.escrowContract.getFundingProgress(nftID);
     this.#escrowStore.update((s) => ({ ...s, deposit }));
   }
+
+  async approveSale(nftID) {
+      const transaction = await this.ethersProvider?.escrowContract.approveSale(nftID);
+      await transaction.wait();
+    }
   
   async #nftAddress(){
     const eadd = await this.ethersProvider?.escrowContract.getEadd();

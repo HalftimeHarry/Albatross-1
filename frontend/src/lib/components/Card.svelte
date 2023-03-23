@@ -26,7 +26,6 @@
 		// find the NFT in the array and update its deposit value
 		const index = nftArray.findIndex((nft) => nft.id === nftID);
 		nftArray[index].deposit = deposit;
-		console.log(nftArray);
 
 		EscrowController.escrowStore((s) => ({ ...s, deposit }));
 	}
@@ -48,8 +47,7 @@
 	<p class="ml-4 mt-2 text-center font-sans text-cyan-800 font-bold">Funding Progress Bar</p>
 	<div class="mt-4">
 		{#each nftArray as nft}
-			<p>ID: {nft.id}</p>
-			<p>Deposit: {nft.deposit}</p>
+			<ProgressBar progress={nft.deposit} />;
 		{/each}
 	</div>
 	<img class="rounded-t-lg" src={image} alt={name} />
@@ -78,7 +76,7 @@
 				});
 			}}
 		>
-			Next
+			Fund
 			<svg
 				aria-hidden="true"
 				class="w-4 h-4 ml-2 -mr-1"
