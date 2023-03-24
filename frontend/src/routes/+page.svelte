@@ -7,7 +7,6 @@
 	import franchiseController from '/workspace/Albatross-1/frontend/src/lib/controllers/FranchiseController.js';
 	import { onMount } from 'svelte';
 
-
 	onMount(async () => {
 		await escrowController.init();
 		await franchiseController.init();
@@ -18,7 +17,6 @@
 
 	$: ({ eadd } = $escrow_store);
 	$: ({ nfts } = $franchise_store);
-
 
 	const ethersProvider = new EthersProvider();
 	let nfts = [];
@@ -48,26 +46,26 @@
 
 <section class="container mx-auto ml-auto">
 	<h1
-		class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-blue-500 md:text-5xl lg:text-6xl dark:text-white"
+		class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-yellow-600 md:text-5xl lg:text-6xl dark:text-white"
 		in:fly={{ y: 200, duration: 2000 }}
 		out:fade
 	>
-		 <!--.{eadd}. To debug let this prit if there is an address its conected --> 
-		 Albatross Franchise Listings
+		<!--.{eadd}. To debug let this prit if there is an address its conected -->
+		Albatross Franchise Listings
 	</h1>
 	<p
 		class="mb-6 text-lg font-normal text-white lg:text-xl sm:px-16 xl:px-48"
 		in:fly={{ y: 200, duration: 2000 }}
 		out:fade
 	>
-		Fund a franchise become an owner in our leauge!
+		Fund a franchise become and become an owner!
 	</p>
 
 	{#if nfts}
 		<div class="grid gap-2 md:grid-cols-3" in:fly={{ y: 200, duration: 2000 }} out:fade>
 			{#each nfts as nft}
 				{#if nft.name && nft.image && nft.area && nft.id}
-					<Card name={nft.name} image={nft.image} area={nft.area} nftID={nft.id}/>
+					<Card name={nft.name} image={nft.image} area={nft.area} nftID={nft.id} />
 				{/if}
 			{/each}
 		</div>

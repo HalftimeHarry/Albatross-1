@@ -90,5 +90,11 @@
 				/></svg
 			>
 		</a>
+		<ul class="steps">
+			<li data-content="$" class="step step-neutral text-black font-bold m-2">Fund</li>
+			<li data-content="✓" class="step step-neutral font-bold m-2">Approve</li>
+			<li data-content="->" class="step step-neutral font-bold m-2">DAO</li>
+			<li data-content="●" class="step step-neutral font-bold m-2">Go Live</li>
+		</ul>
 	</div>
 </div>
