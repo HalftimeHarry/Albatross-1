@@ -42,44 +42,29 @@
 	const handleClick = async () => {
 		const activeAcct = getActiveAccount();
 
+		let role;
 		if (activeAcct.toLowerCase() === seller.toLowerCase()) {
-			// execute seller function
-			const ApproveSale = (await import('./ApproveSale.svelte')).default;
-			new ApproveSale({
-				target: document.body,
-				props: {
-					nftID
-				}
-			});
+			role = 'seller';
 		} else if (activeAcct.toLowerCase() === lender.toLowerCase()) {
-			// execute lender function
-			const ApproveSale = (await import('./ApproveSale.svelte')).default;
-			new ApproveSale({
-				target: document.body,
-				props: {
-					nftID
-				}
-			});
+			role = 'lender';
 		} else if (activeAcct.toLowerCase() === inspector.toLowerCase()) {
-			// execute inspector function
-			const ApproveSale = (await import('./ApproveSale.svelte')).default;
-			new ApproveSale({
-				target: document.body,
-				props: {
-					nftID
-				}
-			});
+			role = 'inspector';
 		} else if (activeAcct.toLowerCase() === dao.toLowerCase()) {
-			// execute dao function
+			role = 'dao';
+		} else {
+			role = 'buyer';
+		}
+
+		if (role !== 'buyer') {
 			const ApproveSale = (await import('./ApproveSale.svelte')).default;
 			new ApproveSale({
 				target: document.body,
 				props: {
-					nftID
+					nftID,
+					role
 				}
 			});
 		} else {
-			// display FundFranchise component for buyer
 			const FundFranchise = (await import('./FundFranchise.svelte')).default;
 			new FundFranchise({
 				target: document.body,
