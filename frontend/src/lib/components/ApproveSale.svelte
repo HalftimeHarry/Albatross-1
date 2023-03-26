@@ -1,6 +1,7 @@
 <script>
 	import { writable } from 'svelte/store';
 	import escrowController from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
+	import { isOverlayOpen } from '/workspace/Albatross-1/frontend/src/lib/providers/overlayProvider.js';
 
 	export let nftID;
 
@@ -16,6 +17,7 @@
 	const handleClick = async (event) => {
 		event.preventDefault();
 		await approveSale(nftID);
+		isOverlayOpen.set(false);
 	};
 </script>
 

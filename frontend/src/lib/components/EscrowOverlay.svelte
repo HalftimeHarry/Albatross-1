@@ -53,13 +53,31 @@
 			});
 		} else if (activeAcct.toLowerCase() === lender.toLowerCase()) {
 			// execute lender function
-			console.log('Lender clicked the button');
+			const ApproveSale = (await import('./ApproveSale.svelte')).default;
+			new ApproveSale({
+				target: document.body,
+				props: {
+					nftID
+				}
+			});
 		} else if (activeAcct.toLowerCase() === inspector.toLowerCase()) {
 			// execute inspector function
-			console.log('Inspector clicked the button');
+			const ApproveSale = (await import('./ApproveSale.svelte')).default;
+			new ApproveSale({
+				target: document.body,
+				props: {
+					nftID
+				}
+			});
 		} else if (activeAcct.toLowerCase() === dao.toLowerCase()) {
-			// execute DAO function
-			console.log('DAO clicked the button');
+			// execute dao function
+			const ApproveSale = (await import('./ApproveSale.svelte')).default;
+			new ApproveSale({
+				target: document.body,
+				props: {
+					nftID
+				}
+			});
 		} else {
 			// display FundFranchise component for buyer
 			const FundFranchise = (await import('./FundFranchise.svelte')).default;

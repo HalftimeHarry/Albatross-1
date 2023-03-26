@@ -1,8 +1,8 @@
 <script>
 	import { crossfade, fade, fly } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
-	import Card from '/workspace/Albatross-1/frontend/src/lib/components/Card.svelte';
-	import EthersProvider from '../lib/providers/ethersProvider.js';
+	import Table from '/workspace/Albatross-1/frontend/src/lib/components/Table.svelte';
+	import EthersProvider from '/workspace/Albatross-1/frontend/src/lib/providers/ethersProvider.js';
 	import escrowController from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
 	import franchiseController from '/workspace/Albatross-1/frontend/src/lib/controllers/FranchiseController.js';
 	import { onMount } from 'svelte';
@@ -12,22 +12,23 @@
 		await franchiseController.init();
 	});
 
-	const { escrow_store } = escrowController;
 	const { franchise_store } = franchiseController;
 
-	$: ({ inspector, lender, approval } = $escrow_store);
-	console.log(approval);
 	$: ({ nfts } = $franchise_store);
 
 	const ethersProvider = new EthersProvider();
+
+	
+
 	let nfts = [];
 
 	async function getNfts() {
-		const nfts = await ethersProvider.getNFTs();
+		const nfts = await ethersProvider.franchiseContract.getTokenURI();
 		nfts.sort((a, b) => a.id - b.id);
 		nfts.slice(12); // Skip the first 12 items
 		nfts.filter((nft) => nft.name && nft.image && nft.area && nft.id);
 		nfts.forEach((nft) => nfts.push(nft));
+		return nfts;
 	}
 
 	const transitionConfig = (node, { delay = 0, duration = 400, easing = null }) => {
@@ -51,11 +52,7 @@
 		in:fly={{ y: 200, duration: 2000 }}
 		out:fade
 	>
-		<!--.{eadd}. To debug let this prit if there is an address its conected -->
 		Albatross Franchise Listings
-		{approval}
-		{inspector}
-		{lender}
 	</h1>
 	<p
 		class="mb-6 text-lg font-normal text-white lg:text-xl sm:px-16 xl:px-48"
@@ -66,13 +63,7 @@
 	</p>
 
 	{#if nfts}
-		<div class="grid gap-2 md:grid-cols-3" in:fly={{ y: 200, duration: 2000 }} out:fade>
-			{#each nfts as nft}
-				{#if nft.name && nft.image && nft.area && nft.id}
-					<Card name={nft.name} image={nft.image} area={nft.area} nftID={nft.id} />
-				{/if}
-			{/each}
-		</div>
+		<Table rows={nfts} />
 	{:else}
 		<p>Loading...</p>
 	{/if}
