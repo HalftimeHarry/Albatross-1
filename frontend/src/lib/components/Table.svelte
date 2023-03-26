@@ -11,6 +11,10 @@
 
 	$: ({ inspector, lender, dao, seller } = $escrow_store);
 
+	function shortenAddress(address) {
+		return `${address.slice(0, 6)}...${address.slice(-4)}`;
+	}
+
 	onMount(async () => {
 		await EscrowController.init();
 
@@ -36,26 +40,30 @@
 
 	async function getApprovalStatus(nftID, inspector) {
 		const status = await ethersProvider?.escrowContract.getApprovalStatus(nftID, inspector);
-		console.log(status);
 		return status;
 	}
 </script>
 
-{inspector}
-{lender}
-{dao}
-{seller}
-
+<div class="text-black" style="display: none">
+	Lender |{shortenAddress(lender)} | Inspector |{shortenAddress(inspector)} | DAO |{shortenAddress(
+		dao
+	)} | Seller |{shortenAddress(seller)}
+</div>
+<div class="grid grid-cols-3 justify-center font-semibold mb-4 uppercase">
+	<div class="col-span-1" />
+	<div class="col-span-1 text-right">Approvals</div>
+	<div class="col-span-1" />
+</div>
 <table class="table w-full">
 	<!-- head -->
 	<thead>
 		<tr>
 			<th />
-			<th>Name</th>
-			<th>Lender Approval</th>
-			<th>Inspector Approval</th>
-			<th>DAO Approval</th>
-			<th>Seller Approval</th>
+			<th>Franchise</th>
+			<th>Inspector</th>
+			<th>Lender</th>
+			<th>DAO</th>
+			<th>Seller</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -64,10 +72,28 @@
 			<tr>
 				<th>{row.id}</th>
 				<td>{row.name}</td>
-				<td>{row.lenderApproval}</td>
-				<td>{row.inspectorApproval}</td>
-				<td>{row.daoApproval}</td>
-				<td>{row.sellerApproval}</td>
+				<td
+					><i
+						class={row.inspectorApproval ? 'fas fa-check text-green-500' : 'fas fa-times text-red-500'}
+					/></td
+				>
+				<td
+					><i
+						class={row.lenderApproval
+							? 'fas fa-check text-green-500'
+							: 'fas fa-times text-red-500'}
+					/></td
+				>
+				<td
+					><i
+						class={row.daoApproval ? 'fas fa-check text-green-500' : 'fas fa-times text-red-500'}
+					/></td
+				>
+				<td
+					><i
+						class={row.sellerApproval ? 'fas fa-check text-green-500' : 'fas fa-times text-red-500'}
+					/></td
+				>
 			</tr>
 		{/each}
 	</tbody>
