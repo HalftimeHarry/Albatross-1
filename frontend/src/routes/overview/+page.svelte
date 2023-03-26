@@ -17,14 +17,18 @@
 	$: ({ nfts } = $franchise_store);
 
 	const ethersProvider = new EthersProvider();
+
+	
+
 	let nfts = [];
 
 	async function getNfts() {
-		const nfts = await ethersProvider.getNFTs();
+		const nfts = await ethersProvider.franchiseContract.getTokenURI();
 		nfts.sort((a, b) => a.id - b.id);
 		nfts.slice(12); // Skip the first 12 items
 		nfts.filter((nft) => nft.name && nft.image && nft.area && nft.id);
 		nfts.forEach((nft) => nfts.push(nft));
+		return nfts;
 	}
 
 	const transitionConfig = (node, { delay = 0, duration = 400, easing = null }) => {

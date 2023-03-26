@@ -32,7 +32,13 @@ class EthersProvider {
         const transaction = await contract.connect(this.signer).approveSale(nftID);
         await transaction.wait();
       },
-      getEadd: async () => await contract.inspector(),
+      getInspector: async () => await contract.inspector(),
+      getLender: async () => await contract.lender(),
+      getDao: async () => await contract.dao(),
+      getSeller: async () => await contract.seller(),
+      getApprovalStatus: async (nftID, address) => {
+        return await contract.approval(nftID, address);
+      },
       buyerDepositEarnest: async (nftID, { amount }) => {
         const amountInWei = ethers.utils.parseUnits(amount.toString(), 'ether');
         const tx = await contract.connect(this.signer).depositEarnest(nftID, { value: amountInWei });

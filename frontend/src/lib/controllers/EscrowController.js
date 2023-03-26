@@ -3,8 +3,12 @@ import { writable } from "svelte/store";
 
 
 const baseState={
-  eadd: "loading nft address...",
-  deposit: "deposits ..."
+  inspector: "loading inspector address...",
+  lender: "loading lender address",
+  dao: "loading dao...",
+  seller: "loading seller",
+  deposit: "deposits ...",
+  approval: false
 }
 
 class EscrowController{
@@ -18,9 +22,13 @@ class EscrowController{
 
   async init() {
     this.ethersProvider = new EthersProvider();
-    this.#nftAddress();
+    this.#inspectorAddress();
+    this.#lenderAddress();
+    this.#daoAddress();
+    this.#sellerAddress();
     this.getProgress();
     this.approveSale();
+    this.getApprovalStatus();
   }
 
   async buyersDepositEarnest(nftId, amount) {
@@ -38,9 +46,29 @@ class EscrowController{
       await transaction.wait();
     }
   
-  async #nftAddress(){
-    const eadd = await this.ethersProvider?.escrowContract.getEadd();
-    this.#escrowStore.update(s => ({...s, eadd }))
+  async #inspectorAddress(){
+    const inspector = await this.ethersProvider?.escrowContract.getInspector();
+    this.#escrowStore.update(s => ({...s, inspector }))
+  }
+
+    async #lenderAddress(){
+    const lender = await this.ethersProvider?.escrowContract.getLender();
+    this.#escrowStore.update(s => ({...s, lender }))
+  }
+
+    async #daoAddress(){
+    const dao = await this.ethersProvider?.escrowContract.getDao();
+    this.#escrowStore.update(s => ({...s, dao }))
+    }
+  
+    async #sellerAddress(){
+      const seller = await this.ethersProvider?.escrowContract.getSeller();
+    this.#escrowStore.update(s => ({...s, seller }))
+  }
+
+  async getApprovalStatus(nftID, address) {
+    const approval = await this.ethersProvider?.escrowContract.getApprovalStatus(nftID, address);
+    this.#escrowStore.update(s => ({...s, approval }))
   }
 
 }
