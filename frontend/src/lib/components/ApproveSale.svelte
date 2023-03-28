@@ -21,13 +21,10 @@
 	};
 </script>
 
-<form>
-	<button
-		type="submit"
-		class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
-		on:click={handleClick}
-		style="position: fixed; bottom: 20px; right: 20px; z-index: 999;"
-	>
-		Approve Sale
-	</button>
-</form>
+<button
+	type="submit"
+	class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
+	on:click={handleClick}
+>
+	Approve Sale
+</button>

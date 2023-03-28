@@ -102,41 +102,41 @@
 				<button
 					type="button"
 					class="mt-4 text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
-					on:click={() => handleClick(activeAcct)}
+					on:click={() => handleClick()}
 				>
 					{#if activeAcct.toLowerCase() === seller.toLowerCase()}
-						<div class="mr-3 mt-4">Seller Approval</div>
+						<div class="mt-4 mr-3">Seller</div>
 						<ApproveSale
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
-							on:fund={() => handleClick(activeAcct)}
+							on:approve={() => handleClick()}
 						/>
 					{:else if activeAcct.toLowerCase() === lender.toLowerCase()}
-						<div class="mr-3 mt-4">Lender Approval</div>
+						<div class="mt-4 mr-3">Lender</div>
 						<ApproveSale
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
-							on:fund={() => handleClick(activeAcct)}
+							on:approve={() => handleClick()}
 						/>
 					{:else if activeAcct.toLowerCase() === inspector.toLowerCase()}
-						<div class="mr-3 mt-4">Inspector Approval</div>
+						<div class="mt-4 mr-3">Inspector</div>
 						<ApproveSale
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
-							on:fund={() => handleClick(activeAcct)}
+							on:approve={() => handleClick()}
 						/>
 					{:else if activeAcct.toLowerCase() === dao.toLowerCase()}
-						<div class="mr-3 mt-4">DAO Approval</div>
+						<div class="mt-4 mr-3">DAO</div>
 						<ApproveSale
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
-							on:fund={() => handleClick(activeAcct)}
+							on:approve={() => handleClick()}
 						/>
 					{:else}
 						<FundFranchise
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
-							on:fund={() => handleClick(activeAcct)}
+							on:fund={() => handleClick()}
 						/>
 					{/if}
 				</button>
