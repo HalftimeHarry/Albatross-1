@@ -109,35 +109,36 @@
 						<ApproveSale
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
-							on:approve={() => handleClick()}
+							on:approve={() => isOverlayOpen.set(false)}
 						/>
 					{:else if activeAcct.toLowerCase() === lender.toLowerCase()}
 						<div class="mt-4 mr-3">Lender</div>
 						<ApproveSale
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
-							on:approve={() => handleClick()}
+							on:approve={() => isOverlayOpen.set(false)}
 						/>
 					{:else if activeAcct.toLowerCase() === inspector.toLowerCase()}
 						<div class="mt-4 mr-3">Inspector</div>
 						<ApproveSale
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
-							on:approve={() => handleClick()}
+							on:approve={() => isOverlayOpen.set(false)}
 						/>
 					{:else if activeAcct.toLowerCase() === dao.toLowerCase()}
 						<div class="mt-4 mr-3">DAO</div>
 						<ApproveSale
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
-							on:approve={() => handleClick()}
+							on:approve={() => isOverlayOpen.set(false)}
 						/>
 					{:else}
 						<FundFranchise
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
-							on:fund={() => handleClick()}
+							on:fund={() => isOverlayOpen.set(false)}
 						/>
+						With these changes, the EscrowOverlay should close after the transaction is successful.
 					{/if}
 				</button>
 			</div>
