@@ -6,7 +6,9 @@
 	import { fundingProgress } from '/workspace/Albatross-1/frontend/src/lib/providers/progressBarProvider.js';
 	import { onMount } from 'svelte';
 	import EthersProvider from '/workspace/Albatross-1/frontend/src/lib/providers/ethersProvider.js';
-	import EscrowController from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
+	import EscrowController, {
+		escrow_store
+	} from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
 
 	export let name;
 	export let image;
@@ -27,7 +29,7 @@
 		const index = nftArray.findIndex((nft) => nft.id === nftID);
 		nftArray[index].deposit = deposit;
 
-		EscrowController.escrowStore((s) => ({ ...s, deposit }));
+		escrow_store.update((s) => ({ ...s, deposit }));
 	}
 
 	onMount(async () => {

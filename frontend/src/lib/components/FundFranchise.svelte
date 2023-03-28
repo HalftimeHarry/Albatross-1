@@ -1,25 +1,30 @@
 <script>
 	import { writable } from 'svelte/store';
 	import escrowController from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
+	import { createEventDispatcher } from 'svelte';
 
 	export let nftID;
 
 	export const amount = writable(null);
+	const dispatch = createEventDispatcher();
 
-	const contribute = async (nftID, amount) => {
+	const buyersDepositEarnest = async (nftID, amount) => {
 		const ethValue = Number(amount) / 1e18;
 		const formattedAmount = ethValue.toFixed(18);
-		const response = await escrowController.buyersDepositEarnest(nftID, { amount: formattedAmount });
+		const response = await escrowController.buyersDepositEarnest(nftID, {
+			amount: formattedAmount
+		});
 		console.log(response);
+		return response;
 	};
 
-	export { contribute };
+	export { buyersDepositEarnest };
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		const response = await escrowController.buyersDepositEarnest(nftID, $amount);
-
 		contribute(nftID, $amount);
+		dispatch('fund');
 	};
 </script>
 
