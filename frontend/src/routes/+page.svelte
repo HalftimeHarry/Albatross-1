@@ -16,7 +16,7 @@
 	const { franchise_store } = franchiseController;
 
 	$: ({ inspector, lender, approval } = $escrow_store);
-	console.log(approval);
+
 	$: ({ nfts } = $franchise_store);
 
 	const ethersProvider = new EthersProvider();
