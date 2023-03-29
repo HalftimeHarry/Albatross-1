@@ -90,4 +90,8 @@ class EscrowController {
 const escrowController = new EscrowController();
 const escrow_store = escrowController.escrow_store;
 export default escrowController;
+<<<<<<< HEAD
 export { escrow_store };
+=======
+export { escrow_store };
+>>>>>>> e6c8101 (New update added)
