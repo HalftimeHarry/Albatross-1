@@ -136,9 +136,9 @@
 						<FundFranchise
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
-							on:fund={() => isOverlayOpen.set(false)}
+							on:amount={() => isOverlayOpen.set(false)}
 						/>
-						With these changes, the EscrowOverlay should close after the transaction is successful.
+						This should close after<br /><br /> the transaction is successful.
 					{/if}
 				</button>
 			</div>

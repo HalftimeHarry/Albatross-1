@@ -23,8 +23,9 @@
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		const response = await escrowController.buyersDepositEarnest(nftID, $amount);
-		contribute(nftID, $amount);
-		dispatch('fund');
+		buyersDepositEarnest(nftID, $amount).then(() => {
+			dispatch('amount');
+		});
 	};
 </script>
 
