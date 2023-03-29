@@ -31,8 +31,16 @@ class EscrowController {
   }
 
   async buyersDepositEarnest(nftId, amount) {
-    const transactionReceipt = await this.ethersProvider?.escrowContract.buyerDepositEarnest(nftId, { amount });
-    return transactionReceipt;
+    try {
+      const transactionReceipt = await this.ethersProvider?.escrowContract.buyerDepositEarnest(nftId, { amount });
+      if (transactionReceipt) {
+        await transactionReceipt.wait();
+      } else {
+        console.error("Transaction is undefined.");
+      }
+    } catch (error) {
+      console.error("Error in buyersDepositEarnest:", error);
+    }
   }
 
   async getProgress(nftID) {
