@@ -9,6 +9,7 @@
 	import EscrowController, {
 		escrow_store
 	} from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
+	import { ethers } from 'ethers';
 
 	export let name;
 	export let image;
@@ -16,20 +17,27 @@
 	export let nftID;
 
 	let deposit = 0;
-
 	const ethersProvider = new EthersProvider();
 
 	let nftArray = [];
 
+	const etherAmount = ethers.utils.parseEther('1'); // the ether amount to convert to USD
+	const usdPerEther = 2000; // the current USD price of 1 ether
+
 	async function getProgress(nftID) {
-		const progress = await ethersProvider?.escrowContract.getFundingProgress(nftID);
-		let deposit = progress.toString(10);
+	const progress = await ethersProvider?.escrowContract.getFundingProgress(nftID);
+	let deposit = progress.toString(10);
 
-		// find the NFT in the array and update its deposit value
-		const index = nftArray.findIndex((nft) => nft.id === nftID);
-		nftArray[index].deposit = deposit;
+	const getGoal = await ethersProvider?.escrowContract.getGoalAmount(nftID);
 
-		escrow_store.update((s) => ({ ...s, deposit }));
+	const goal = parseFloat(ethers.utils.formatEther(getGoal)) * usdPerEther;
+
+	// find the NFT in the array and update its deposit value
+	const index = nftArray.findIndex((nft) => nft.id === nftID);
+	nftArray[index].deposit = deposit;
+	nftArray[index].goal = goal - progress;
+
+	escrow_store.update((s) => ({ ...s, deposit }));
 	}
 
 	onMount(async () => {
@@ -50,6 +58,7 @@
 	<div class="mt-4">
 		{#each nftArray as nft}
 			<ProgressBar progress={nft.deposit} />;
+			{nft.goal}
 		{/each}
 	</div>
 	<img class="rounded-t-lg" src={image} alt={name} />

@@ -27,6 +27,11 @@ contract Escrow {
         _;
     }
 
+    modifier notExpired(uint256 _nftID) {
+        require(block.timestamp < deadline[_nftID], "Deadline has passed");
+        _;
+    }
+
     mapping(uint256 => bool) public isListed;
     mapping(uint256 => uint256) public purchasePrice;
     mapping(uint256 => address) public buyer;
@@ -35,6 +40,7 @@ contract Escrow {
     mapping(uint256 => uint256) public goalAmount;
     mapping(uint256 => uint256) public currentDeposit;
     mapping(uint256 => mapping(address => uint256)) public buyerDeposit;
+    mapping(uint256 => uint256) public deadline;
 
     constructor(
         address _nftAddress,
@@ -81,7 +87,8 @@ contract Escrow {
         uint256 _nftID,
         address _buyer,
         uint256 _purchasePrice,
-        uint256 _goalAmount
+        uint256 _goalAmount,
+        uint256 _deadline
     ) public payable {
         // Transfer NFT from seller to this contract
         IERC721(nftAddress).transferFrom(msg.sender, address(this), _nftID);
@@ -90,12 +97,13 @@ contract Escrow {
         purchasePrice[_nftID] = _purchasePrice;
         goalAmount[_nftID] = _goalAmount;
         buyer[_nftID] = _buyer;
+        deadline[_nftID] = _deadline;
     }
 
     // Put Under Contract (only buyer - payable escrow)
     function depositEarnest(uint256 _nftID) public payable {
         // Set goal amount to 5
-        uint256 goal = 9000000000000000000;
+        uint256 goal = 500000000000000000000;
         goalAmount[_nftID] = goal;
 
         require(
@@ -138,7 +146,7 @@ contract Escrow {
     // -> Transfer NFT to DAO
     // -> Transfer Funds to seller
     // -> Create NFT that represents what is at stake for the buyer
-    // -> Return exessFunds to buyer when goalAmount is achieved 
+    // -> Return exessFunds to buyer when goalAmount is achieved
     function finalizeSale(uint256 _nftID) public {
         require(inspectionPassed[_nftID]);
         require(approval[_nftID][buyer[_nftID]]);
@@ -163,6 +171,25 @@ contract Escrow {
         IERC721(nftAddress).transferFrom(address(this), dao, _nftID);
 
         // TODO: Create NFT that represents what is at stake for the buyer
+    }
+
+    // New function to refund contributions after the deadline has passed
+    function refund(uint256 _nftID) public {
+        require(
+            block.timestamp >= deadline[_nftID],
+            "Deadline has not passed yet"
+        );
+        require(
+            inspectionPassed[_nftID] == false,
+            "Inspection has been passed"
+        );
+        uint256 amount = buyerDeposit[_nftID][msg.sender];
+        require(amount > 0, "No contribution found for the sender");
+
+        buyerDeposit[_nftID][msg.sender] = 0;
+        currentDeposit[_nftID] -= amount;
+
+        payable(msg.sender).transfer(amount);
     }
 
     // Cancel Sale (handle earnest deposit)
