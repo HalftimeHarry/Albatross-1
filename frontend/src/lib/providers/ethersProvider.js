@@ -46,8 +46,10 @@ class EthersProvider {
         return receipt;
       },
       getGoalAmount: async (nftID) => {
-        console.log(`getGoalAmount with nftID: ${nftID}`);
         return await contract.goalAmount(nftID);
+      },
+      getDeadLine: async (nftID) => {
+        return await contract.deadline(nftID);
         },
       getPurchasePrice: async (nftID) => {
         console.log(`getPurchasePrice called with nftID: ${nftID}`);
