@@ -44,9 +44,17 @@ class EthersProvider {
         const tx = await contract.connect(this.signer).depositEarnest(nftID, { value: amountInWei });
         const receipt = await tx.wait();
         return receipt;
-      }
-    };
-  }
+      },
+      getPurchasePrice: async (nftID) => {
+        console.log(`getPurchasePrice called with nftID: ${nftID}`);
+        return await contract.purchasePrice(nftID);
+        },
+      getContributions: async (nftID) => {
+          console.log(`getContributions called with nftID: ${nftID}`);
+          return await contract.currentDeposit(nftID);
+        },
+      };
+    }
 
   get franchiseContract() {
     const contract = this.getContract({

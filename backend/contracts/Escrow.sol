@@ -29,7 +29,6 @@ contract Escrow {
 
     mapping(uint256 => bool) public isListed;
     mapping(uint256 => uint256) public purchasePrice;
-    mapping(uint256 => uint256) public escrowAmount;
     mapping(uint256 => address) public buyer;
     mapping(uint256 => bool) public inspectionPassed;
     mapping(uint256 => mapping(address => bool)) public approval;
@@ -82,14 +81,14 @@ contract Escrow {
         uint256 _nftID,
         address _buyer,
         uint256 _purchasePrice,
-        uint256 _escrowAmount
+        uint256 _goalAmount
     ) public payable {
         // Transfer NFT from seller to this contract
         IERC721(nftAddress).transferFrom(msg.sender, address(this), _nftID);
 
         isListed[_nftID] = true;
         purchasePrice[_nftID] = _purchasePrice;
-        escrowAmount[_nftID] = _escrowAmount;
+        goalAmount[_nftID] = _goalAmount;
         buyer[_nftID] = _buyer;
     }
 
@@ -136,24 +135,34 @@ contract Escrow {
     // -> Require inspection status (add more items here, like appraisal)
     // -> Require sale to be authorized
     // -> Require funds to be correct amount
-    // -> Transfer NFT to buyer
+    // -> Transfer NFT to DAO
     // -> Transfer Funds to seller
+    // -> Create NFT that represents what is at stake for the buyer
+    // -> Return exessFunds to buyer when goalAmount is achieved 
     function finalizeSale(uint256 _nftID) public {
         require(inspectionPassed[_nftID]);
         require(approval[_nftID][buyer[_nftID]]);
         require(approval[_nftID][seller]);
         require(approval[_nftID][lender]);
         require(approval[_nftID][dao]);
-        require(address(this).balance >= purchasePrice[_nftID]);
+
+        uint256 excessFunds = address(this).balance - purchasePrice[_nftID];
 
         isListed[_nftID] = false;
 
-        (bool success, ) = payable(seller).call{value: address(this).balance}(
+        (bool success, ) = payable(seller).call{value: purchasePrice[_nftID]}(
             ""
         );
         require(success);
 
+        if (excessFunds > 0) {
+            (success, ) = payable(buyer[_nftID]).call{value: excessFunds}("");
+            require(success);
+        }
+
         IERC721(nftAddress).transferFrom(address(this), dao, _nftID);
+
+        // TODO: Create NFT that represents what is at stake for the buyer
     }
 
     // Cancel Sale (handle earnest deposit)
