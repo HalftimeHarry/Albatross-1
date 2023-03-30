@@ -9,7 +9,7 @@
 
 	const { escrow_store } = EscrowController;
 
-	$: ({ inspector, lender, dao, seller } = $escrow_store);
+	$: ({ inspector, lender, dao, seller, price, contributions } = $escrow_store);
 
 	function shortenAddress(address) {
 		return `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -25,13 +25,17 @@
 			const inspectorApproval = await getApprovalStatus(nftID, $escrow_store.inspector);
 			const daoApproval = await getApprovalStatus(nftID, $escrow_store.dao);
 			const sellerApproval = await getApprovalStatus(nftID, $escrow_store.seller);
+			const price = await ethersProvider.escrowContract.getPurchasePrice(nftID);
+			const contributions = await ethersProvider.escrowContract.getContributions(nftID);
 			updatedRows.push({
 				...row,
 				nftID,
 				lenderApproval,
 				inspectorApproval,
 				daoApproval,
-				sellerApproval
+				sellerApproval,
+				price,
+				contributions
 			});
 			nftID++;
 		}
@@ -45,25 +49,33 @@
 </script>
 
 <div class="text-black" style="display: none">
-	Lender |{shortenAddress(lender)} | Inspector |{shortenAddress(inspector)} | DAO |{shortenAddress(
+	Lender | {shortenAddress(lender)} | Inspector | {shortenAddress(inspector)} | DAO | {shortenAddress(
 		dao
-	)} | Seller |{shortenAddress(seller)}
+	)} | Seller | {shortenAddress(seller)}
 </div>
-<div class="grid grid-cols-3 justify-center font-semibold mb-4 uppercase">
+
+<div class="grid grid-cols-7 justify-center font-semibold mb-4 uppercase">
 	<div class="col-span-1" />
-	<div class="col-span-1 text-right">Approvals</div>
+	<div class="col-span-2 text-right mt-4">Who Has Signed off on franchise</div>
+	<div class="col-span-1" />
+	<div class="col-span-1" />
+	<div class="col-span-1" />
+	<div class="col-span-6 text-right">Details</div>
 	<div class="col-span-1" />
 </div>
+
 <table class="table w-full">
 	<!-- head -->
 	<thead>
 		<tr>
 			<th />
 			<th>Franchise</th>
-			<th>Inspector</th>
-			<th>Lender</th>
-			<th>DAO</th>
-			<th>Seller</th>
+			<th>Inspector <br />({shortenAddress(inspector)})</th>
+			<th>Lender <br />({shortenAddress(lender)})</th>
+			<th>DAO <br />({shortenAddress(dao)})</th>
+			<th>Seller <br />({shortenAddress(seller)})</th>
+			<th>Purchase Price <br />{price}</th>
+			<th>Current Contributions<br />{contributions}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -74,14 +86,14 @@
 				<td>{row.name}</td>
 				<td
 					><i
-						class={row.inspectorApproval ? 'fas fa-check text-green-500' : 'fas fa-times text-red-500'}
+						class={row.inspectorApproval
+							? 'fas fa-check text-green-500'
+							: 'fas fa-times text-red-500'}
 					/></td
 				>
 				<td
 					><i
-						class={row.lenderApproval
-							? 'fas fa-check text-green-500'
-							: 'fas fa-times text-red-500'}
+						class={row.lenderApproval ? 'fas fa-check text-green-500' : 'fas fa-times text-red-500'}
 					/></td
 				>
 				<td
@@ -94,6 +106,8 @@
 						class={row.sellerApproval ? 'fas fa-check text-green-500' : 'fas fa-times text-red-500'}
 					/></td
 				>
+				<td>{row.price}</td>
+				<td>{row.contributions}</td>
 			</tr>
 		{/each}
 	</tbody>

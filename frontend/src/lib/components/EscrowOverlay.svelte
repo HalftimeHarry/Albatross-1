@@ -138,7 +138,6 @@
 							on:close={() => isOverlayOpen.set(false)}
 							on:amount={() => isOverlayOpen.set(false)}
 						/>
-						This should close after<br /><br /> the transaction is successful.
 					{/if}
 				</button>
 			</div>

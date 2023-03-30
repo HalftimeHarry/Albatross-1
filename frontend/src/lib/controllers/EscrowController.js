@@ -7,6 +7,8 @@ const baseState = {
   dao: "loading dao...",
   seller: "loading seller",
   deposit: "deposits ...",
+  contributions: "contributions ...",
+  price: "price ...",
   approval: false,
 };
 
@@ -25,9 +27,8 @@ class EscrowController {
     this.#lenderAddress();
     this.#daoAddress();
     this.#sellerAddress();
-    this.getProgress();
-    this.approveSale();
-    this.getApprovalStatus();
+    this.getPurchasePrice();
+    this.getContributions();
   }
 
   async buyersDepositEarnest(nftId, amount) {
@@ -84,6 +85,16 @@ class EscrowController {
   async getApprovalStatus(nftID, address) {
     const approval = await this.ethersProvider?.escrowContract.getApprovalStatus(nftID, address);
     this.#escrowStore.update((s) => ({ ...s, approval }));
+  }
+
+  async getPurchasePrice(nftID) {
+    const price = await this.ethersProvider?.escrowContract.getPurchasePrice(nftID);
+    this.#escrowStore.update((s) => ({ ...s, price }));
+  }
+
+  async getContributions(nftID) {
+    const contributions = await this.ethersProvider?.escrowContract.getContributions(nftID);
+    this.#escrowStore.update((s) => ({ ...s, contributions }));
   }
 }
 

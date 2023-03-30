@@ -23,7 +23,7 @@ class FranchiseController{
   }
 
   async #getTotalSupply(){
-    const totalSupply = await this.ethersProvider.franchiseContract.getTotalSupply();
+    const totalSupply = await this.ethersProvider?.franchiseContract.getTotalSupply();
     this.#franchiseStore.update(s => ({ ...s, totalSupply }))
   }
 
