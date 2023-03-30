@@ -10,6 +10,7 @@ const baseState = {
   contributions: "contributions ...",
   price: "price ...",
   goal: "Goal Amount ...",
+  deadline: "Deadline ...",
   approval: false,
 };
 
@@ -31,6 +32,7 @@ class EscrowController {
     this.getPurchasePrice();
     this.getContributions();
     this.getGoalAmount();
+    this.getDeadLine();
   }
 
   async buyersDepositEarnest(nftId, amount) {
@@ -54,6 +56,11 @@ class EscrowController {
   async getGoalAmount(nftID) {
     const goal = await this.ethersProvider?.escrowContract.getGoalAmount(nftID);
     this.#escrowStore.update((s) => ({ ...s, goal }));
+  }
+
+  async getDeadLine(nftID) {
+    const deadline = await this.ethersProvider?.escrowContract.getDeadLine(nftID);
+    this.#escrowStore.update((s) => ({ ...s, deadline }));
   }
 
   async approveSale(nftID) {

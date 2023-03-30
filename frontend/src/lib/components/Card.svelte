@@ -21,23 +21,30 @@
 
 	let nftArray = [];
 
-	const etherAmount = ethers.utils.parseEther('1'); // the ether amount to convert to USD
 	const usdPerEther = 2000; // the current USD price of 1 ether
 
 	async function getProgress(nftID) {
-	const progress = await ethersProvider?.escrowContract.getFundingProgress(nftID);
-	let deposit = progress.toString(10);
+		const progress = await ethersProvider?.escrowContract.getFundingProgress(nftID);
+		let deposit = progress.toString(10);
 
-	const getGoal = await ethersProvider?.escrowContract.getGoalAmount(nftID);
+		const getGoal = await ethersProvider?.escrowContract.getGoalAmount(nftID);
 
-	const goal = parseFloat(ethers.utils.formatEther(getGoal)) * usdPerEther;
+		const goal = parseFloat(ethers.utils.formatEther(getGoal)) * usdPerEther;
 
-	// find the NFT in the array and update its deposit value
-	const index = nftArray.findIndex((nft) => nft.id === nftID);
-	nftArray[index].deposit = deposit;
-	nftArray[index].goal = goal - progress;
+		const getDeadline = await ethersProvider?.escrowContract.getDeadLine(nftID);
+		const deadline = new Date(getDeadline.toNumber() * 1000);
 
-	escrow_store.update((s) => ({ ...s, deposit }));
+		const currentTime = new Date();
+		const countdown = Math.floor((deadline - currentTime) / 1000);
+
+		// find the NFT in the array and update its deposit value
+		const index = nftArray.findIndex((nft) => nft.id === nftID);
+		nftArray[index].deposit = deposit;
+		nftArray[index].goal = goal - progress;
+		nftArray[index].deadline = deadline;
+		nftArray[index].countdown = countdown;
+
+		escrow_store.update((s) => ({ ...s, deposit }));
 	}
 
 	onMount(async () => {
@@ -54,11 +61,18 @@
 <div
 	class="max-w-sm bg-white border border-blue-700 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700"
 >
-	<p class="ml-4 mt-2 text-center font-sans text-cyan-800 font-bold">Funding Progress Bar</p>
 	<div class="mt-4">
 		{#each nftArray as nft}
+			<div>Current amount...{nft.deposit}% funded</div>
 			<ProgressBar progress={nft.deposit} />;
-			{nft.goal}
+			{nft.goal}<br />
+			<p>
+				{nft.countdown > 0
+					? `${Math.floor(nft.countdown / 86400)} days, ${Math.floor(
+							(nft.countdown % 86400) / 3600
+					  )} hours left to contribute!`
+					: 'Deadline has passed.'}
+			</p>
 		{/each}
 	</div>
 	<img class="rounded-t-lg" src={image} alt={name} />
