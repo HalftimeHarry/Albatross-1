@@ -12,6 +12,7 @@ const tokens = (n) => {
   return ethers.utils.parseUnits(n.toString(), 'ether')
 }
 
+
 async function main() {
   // Setup accounts
   const [buyer, owner, inspector, lender, dao] = await ethers.getSigners();
@@ -23,6 +24,7 @@ async function main() {
 
   console.log(`Deployed Franchise Contract at: ${franchise.address}`);
   console.log(`Minting 12 properties...\n`);
+  
 
   // Add 12 NFT's using this
   for (let i = 0; i < 12; i++) {
@@ -46,6 +48,10 @@ async function main() {
   console.log(`Deployed Escrow Contract at: ${escrow.address}`);
   console.log(`Listing 12 properties...\n`);
 
+  const deadlineDuration = 60 * 60 * 24 * 7; // 7 days in seconds
+  const currentBlock = await hre.ethers.provider.getBlock('latest');
+  const currentTimestamp = currentBlock.timestamp;
+
   let transaction;
   for (let i = 0; i < 12; i++) {
     // Approve properties...
@@ -54,51 +60,51 @@ async function main() {
   }
 
   // Listing properties...
-  transaction = await escrow.connect(owner).list(1, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(1, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 1')
 
-  transaction = await escrow.connect(owner).list(2, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(2, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 2')
 
-  transaction = await escrow.connect(owner).list(3, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(3, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 3')
 
-  transaction = await escrow.connect(owner).list(4, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(4, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 4')
 
-  transaction = await escrow.connect(owner).list(5, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(5, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 5')
 
-  transaction = await escrow.connect(owner).list(6, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(6, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 6')
 
-  transaction = await escrow.connect(owner).list(7, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(7, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 7')
 
-  transaction = await escrow.connect(owner).list(8, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(8, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 8')
 
-  transaction = await escrow.connect(owner).list(9, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(9, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 9')
 
-  transaction = await escrow.connect(owner).list(10, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(10, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 10')
 
-  transaction = await escrow.connect(owner).list(11, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(11, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 11')
 
-  transaction = await escrow.connect(owner).list(12, buyer.address, tokens(20), tokens(0))
+  transaction = await escrow.connect(owner).list(12, buyer.address, tokens(20), tokens(0), currentTimestamp + deadlineDuration)
   await transaction.wait()
   console.log('mint 12')
 
