@@ -61,11 +61,11 @@
 <div
 	class="max-w-sm bg-white border border-blue-700 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700"
 >
-	<div class="mt-4">
+	<div class="mt-2 text-center font-sans text-cyan-800 font-bold">
 		{#each nftArray as nft}
 			<div>Current amount...{nft.deposit}% funded</div>
-			<ProgressBar progress={nft.deposit} />;
-			{nft.goal}<br />
+			<ProgressBar progress={nft.deposit} />
+			Remaining amount to fund {nft.goal}<br />
 			<p>
 				{nft.countdown > 0
 					? `${Math.floor(nft.countdown / 86400)} days, ${Math.floor(
