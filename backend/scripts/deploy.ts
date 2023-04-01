@@ -15,7 +15,21 @@ const tokens = (n) => {
 
 async function main() {
   // Setup accounts
-  const [buyer, owner, inspector, lender, dao] = await ethers.getSigners();
+    const [buyer, owner, inspector, lender, dao] = await ethers.getSigners();
+  console.log("Deploying contracts with the account:", owner.address);
+
+  const StakeToken = await ethers.getContractFactory("StakeToken");
+  const stakeToken = await StakeToken.deploy("1000000000000000000000000");
+  await stakeToken.deployed();
+  console.log("StakeToken deployed to:", stakeToken.address);
+
+  const NFTDAO = await ethers.getContractFactory("NFTDAO");
+  const nftID = 1;
+  const minQuorum = 1000;
+  const nftDao = await NFTDAO.deploy(stakeToken.address, nftID, minQuorum);
+  await nftDao.deployed();
+  console.log("NFTDAO deployed to:", nftDao.address);
+  
 
   // Deploy Real Estate
   const Franchise = await ethers.getContractFactory('Franchise');
@@ -35,9 +49,10 @@ async function main() {
   }
 
   // Deploy Escrow
-  const Escrow = await ethers.getContractFactory('Escrow');
+  const Escrow = await ethers.getContractFactory("Escrow");
   const escrow = await Escrow.deploy(
-    franchise.address,
+    franchise.address, // Add the NFT contract address as the first argument
+    stakeToken.address,
     owner.address,
     inspector.address,
     lender.address,

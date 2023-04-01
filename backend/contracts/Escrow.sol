@@ -5,8 +5,18 @@ interface IERC721 {
     function transferFrom(address _from, address _to, uint256 _id) external;
 }
 
+interface IERC20 {
+    function mint(address to, uint256 amount) external;
+
+    function transfer(
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
+}
+
 contract Escrow {
     address public nftAddress;
+    address public governanceTokenAddress;
     address payable public seller;
     address public inspector;
     address public lender;
@@ -41,15 +51,18 @@ contract Escrow {
     mapping(uint256 => uint256) public currentDeposit;
     mapping(uint256 => mapping(address => uint256)) public buyerDeposit;
     mapping(uint256 => uint256) public deadline;
+    mapping(uint256 => bool) public saleFinalized;
 
     constructor(
         address _nftAddress,
+        address _governanceTokenAddress,
         address payable _seller,
         address _inspector,
         address _lender,
         address _dao
     ) {
         nftAddress = _nftAddress;
+        governanceTokenAddress = _governanceTokenAddress;
         seller = _seller;
         inspector = _inspector;
         lender = _lender;
@@ -116,8 +129,8 @@ contract Escrow {
 
         if (msg.value > remaining) {
             contribution = remaining;
-            uint256 refund = msg.value - remaining;
-            payable(msg.sender).transfer(refund);
+            uint256 excessAmount = msg.value - remaining;
+            payable(msg.sender).transfer(excessAmount);
         } else {
             contribution = msg.value;
         }
@@ -145,8 +158,8 @@ contract Escrow {
     // -> Require funds to be correct amount
     // -> Transfer NFT to DAO
     // -> Transfer Funds to seller
-    // -> Create NFT that represents what is at stake for the buyer
-    // -> Return exessFunds to buyer when goalAmount is achieved
+    // -> Mint and distribute governance tokens to buyer based on their contribution
+    // -> Return excessFunds to buyer when goalAmount is achieved
     function finalizeSale(uint256 _nftID) public {
         require(inspectionPassed[_nftID]);
         require(approval[_nftID][buyer[_nftID]]);
@@ -170,11 +183,19 @@ contract Escrow {
 
         IERC721(nftAddress).transferFrom(address(this), dao, _nftID);
 
-        // TODO: Create NFT that represents what is at stake for the buyer
+        // Mint and distribute governance tokens to buyer based on their contribution
+        uint256 buyerContribution = buyerDeposit[_nftID][buyer[_nftID]];
+        IERC20(governanceTokenAddress).mint(buyer[_nftID], buyerContribution);
+        saleFinalized[_nftID] = true;
     }
 
     // New function to refund contributions after the deadline has passed
     function refund(uint256 _nftID) public {
+        require(!saleFinalized[_nftID], "Sale has been finalized");
+        require(
+            block.timestamp >= deadline[_nftID],
+            "Deadline has not passed yet"
+        );
         require(
             block.timestamp >= deadline[_nftID],
             "Deadline has not passed yet"
