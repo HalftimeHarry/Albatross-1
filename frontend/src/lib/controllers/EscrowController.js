@@ -11,7 +11,9 @@ const baseState = {
   price: "price ...",
   goal: "Goal Amount ...",
   deadline: "Deadline ...",
+  isListed: false,
   approval: false,
+  inspectionStatus: null,
 };
 
 class EscrowController {
@@ -63,6 +65,31 @@ class EscrowController {
     this.#escrowStore.update((s) => ({ ...s, deadline }));
   }
 
+  async getInspectionStatus(nftID) {
+    const inspectionStatus = await this.ethersProvider?.escrowContract.getInspectionStatus(nftID);
+    this.#escrowStore.update((s) => ({ ...s, inspectionStatus }));
+  }
+
+  /**
+   * @param {any} nftID
+   * @param {any} status
+   */
+  async updateInspectionStatus(nftID, status) {
+    try {
+      const transaction = await this.ethersProvider?.escrowContract.updateInspectionStatus(nftID, status);
+      if (transaction) {
+        await transaction.wait();
+        return true; // Return a value to indicate success
+      } else {
+        console.error("Transaction is undefined. Check contract instance and parameters.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error in updateInspectionStatus:", error);
+      return false;
+    }
+  }
+
   async approveSale(nftID) {
     try {
       const transaction = await this.ethersProvider?.escrowContract.approveSale(nftID);
@@ -99,6 +126,11 @@ class EscrowController {
   async getApprovalStatus(nftID, address) {
     const approval = await this.ethersProvider?.escrowContract.getApprovalStatus(nftID, address);
     this.#escrowStore.update((s) => ({ ...s, approval }));
+  }
+
+  async getIsListed(nftID) {
+    const isListed = await this.ethersProvider?.escrowContract.getIsListed(nftID);
+    this.#escrowStore.update((s) => ({ ...s, isListed }));
   }
 
   async getPurchasePrice(nftID) {

@@ -27,7 +27,11 @@
 		const progress = await ethersProvider?.escrowContract.getFundingProgress(nftID);
 		let deposit = progress.toString(10);
 
+		let isListed = false;
+
 		const getGoal = await ethersProvider?.escrowContract.getGoalAmount(nftID);
+
+		isListed = await ethersProvider?.escrowContract.getIsListed(nftID);
 
 		const goal = parseFloat(ethers.utils.formatEther(getGoal)) * usdPerEther;
 
@@ -43,8 +47,10 @@
 		nftArray[index].goal = goal - progress;
 		nftArray[index].deadline = deadline;
 		nftArray[index].countdown = countdown;
+		nftArray[index].isListed = isListed;
 
 		escrow_store.update((s) => ({ ...s, deposit }));
+		console.log(nftArray);
 	}
 
 	onMount(async () => {
@@ -53,8 +59,8 @@
 
 		await getProgress(nftID);
 	});
-	fundingProgress.subscribe((value) => {
-		deposit = value;
+	fundingProgress.subscribe((s) => {
+		deposit = s;
 	});
 </script>
 
@@ -66,6 +72,7 @@
 			<div>Current amount...{nft.deposit}% funded</div>
 			<ProgressBar progress={nft.deposit} />
 			Remaining amount to fund {nft.goal}<br />
+			{nft.isListed}
 			<p>
 				{nft.countdown > 0
 					? `${Math.floor(nft.countdown / 86400)} days, ${Math.floor(

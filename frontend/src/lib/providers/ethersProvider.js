@@ -32,6 +32,10 @@ class EthersProvider {
         const transaction = await contract.connect(this.signer).approveSale(nftID);
         await transaction.wait();
       },
+      updateInspectionStatus: async (nftID, status) => {
+        const transaction = await contract.connect(this.signer).updateInspectionStatus(nftID, status);
+        await transaction.wait();
+      },
       getInspector: async () => await contract.inspector(),
       getLender: async () => await contract.lender(),
       getDao: async () => await contract.dao(),
@@ -44,6 +48,12 @@ class EthersProvider {
         const tx = await contract.connect(this.signer).depositEarnest(nftID, { value: amountInWei });
         const receipt = await tx.wait();
         return receipt;
+      },
+      getInspectionStatus: async (nftID) => {
+        return await contract.inspectionPassed(nftID);
+      },
+      getIsListed: async (nftID) => {
+        return await contract.getIsListed(nftID);
       },
       getGoalAmount: async (nftID) => {
         return await contract.goalAmount(nftID);
@@ -60,7 +70,7 @@ class EthersProvider {
           return await contract.currentDeposit(nftID);
         },
       };
-    }
+  }
 
   get franchiseContract() {
     const contract = this.getContract({
@@ -81,6 +91,14 @@ class EthersProvider {
         return nfts
       }
     }
+  }
+
+    attachLogSuccessListener(callback) {
+    const contract = this.getContract({
+      abi: escrowAbi.abi,
+      address: escrowAbi.address
+    });
+    contract.on("LogSuccess", callback);
   }
 }
 

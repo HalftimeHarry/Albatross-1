@@ -53,6 +53,8 @@ contract Escrow {
     mapping(uint256 => uint256) public deadline;
     mapping(uint256 => bool) public saleFinalized;
 
+    event LogSuccess(bool success);
+
     constructor(
         address _nftAddress,
         address _governanceTokenAddress,
@@ -161,11 +163,15 @@ contract Escrow {
     // -> Mint and distribute governance tokens to buyer based on their contribution
     // -> Return excessFunds to buyer when goalAmount is achieved
     function finalizeSale(uint256 _nftID) public {
-        require(inspectionPassed[_nftID]);
-        require(approval[_nftID][buyer[_nftID]]);
-        require(approval[_nftID][seller]);
-        require(approval[_nftID][lender]);
-        require(approval[_nftID][dao]);
+        require(inspectionPassed[_nftID], "Inspection has not been passed");
+        require(approval[_nftID][seller], "Seller has not approved");
+        require(approval[_nftID][lender], "Lender has not approved");
+        require(approval[_nftID][dao], "DAO has not approved");
+        require(isListed[_nftID], "NFT not listed for sale");
+        require(
+            currentDeposit[_nftID] >= goalAmount[_nftID],
+            "Funds not sufficient"
+        );
 
         uint256 excessFunds = address(this).balance - purchasePrice[_nftID];
 
@@ -174,6 +180,7 @@ contract Escrow {
         (bool success, ) = payable(seller).call{value: purchasePrice[_nftID]}(
             ""
         );
+        emit LogSuccess(success);
         require(success);
 
         if (excessFunds > 0) {
@@ -185,7 +192,16 @@ contract Escrow {
 
         // Mint and distribute governance tokens to buyer based on their contribution
         uint256 buyerContribution = buyerDeposit[_nftID][buyer[_nftID]];
-        IERC20(governanceTokenAddress).mint(buyer[_nftID], buyerContribution);
+
+        // Set the conversion rate for minting governance tokens
+        uint256 conversionRate = 1; // You can set this to any value you deem appropriate
+
+        // Calculate the number of tokens to mint based on the buyer's contribution and the conversion rate
+        uint256 tokensToMint = buyerContribution * conversionRate;
+
+        // Mint the calculated amount of governance tokens and transfer them to the buyer
+        IERC20(governanceTokenAddress).mint(buyer[_nftID], tokensToMint);
+
         saleFinalized[_nftID] = true;
     }
 
@@ -211,6 +227,10 @@ contract Escrow {
         currentDeposit[_nftID] -= amount;
 
         payable(msg.sender).transfer(amount);
+    }
+
+    function getIsListed(uint256 nftID) public view returns (bool) {
+        return isListed[nftID];
     }
 
     // Cancel Sale (handle earnest deposit)

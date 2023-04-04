@@ -7,7 +7,8 @@
 	import { writable } from 'svelte/store';
 	import FundFranchise from '/workspace/Albatross-1/frontend/src/lib/components/FundFranchise.svelte';
 	import ApproveSale from '/workspace/Albatross-1/frontend/src/lib/components/ApproveSale.svelte';
-
+	import InspectionPassed from '/workspace/Albatross-1/frontend/src/lib/components/InspectionPassed.svelte';
+	
 	let activeAccount = writable(null);
 
 	MetamaskController.store.subscribe((state) => {
@@ -55,7 +56,15 @@
 			role = 'buyer';
 		}
 
-		if (role !== 'buyer') {
+		if (role === 'inspector') {
+			const InspectionPassed = (await import('./InspectionPassed.svelte')).default;
+			new InspectionPassed({
+				target: document.body,
+				props: {
+					nftID
+				}
+			});
+		} else if (role !== 'buyer') {
 			const ApproveSale = (await import('./ApproveSale.svelte')).default;
 			new ApproveSale({
 				target: document.body,
@@ -118,19 +127,19 @@
 							on:close={() => isOverlayOpen.set(false)}
 							on:approve={() => isOverlayOpen.set(false)}
 						/>
-					{:else if activeAcct.toLowerCase() === inspector.toLowerCase()}
-						<div class="mt-4 mr-3">Inspector</div>
-						<ApproveSale
-							{nftID}
-							on:close={() => isOverlayOpen.set(false)}
-							on:approve={() => isOverlayOpen.set(false)}
-						/>
 					{:else if activeAcct.toLowerCase() === dao.toLowerCase()}
 						<div class="mt-4 mr-3">DAO</div>
 						<ApproveSale
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
 							on:approve={() => isOverlayOpen.set(false)}
+						/>
+					{:else if activeAcct.toLowerCase() === inspector.toLowerCase()}
+						<div class="mt-4 mr-3">Inspector</div>
+						<InspectionPassed
+							{nftID}
+							on:close={() => isOverlayOpen.set(false)}
+							on:inspected={() => isOverlayOpen.set(false)}
 						/>
 					{:else}
 						<FundFranchise
