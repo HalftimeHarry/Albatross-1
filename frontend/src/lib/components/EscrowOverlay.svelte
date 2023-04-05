@@ -8,7 +8,7 @@
 	import FundFranchise from '/workspace/Albatross-1/frontend/src/lib/components/FundFranchise.svelte';
 	import ApproveSale from '/workspace/Albatross-1/frontend/src/lib/components/ApproveSale.svelte';
 	import InspectionPassed from '/workspace/Albatross-1/frontend/src/lib/components/InspectionPassed.svelte';
-	
+
 	let activeAccount = writable(null);
 
 	MetamaskController.store.subscribe((state) => {
@@ -135,7 +135,6 @@
 							on:approve={() => isOverlayOpen.set(false)}
 						/>
 					{:else if activeAcct.toLowerCase() === inspector.toLowerCase()}
-						<div class="mt-4 mr-3">Inspector</div>
 						<InspectionPassed
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
