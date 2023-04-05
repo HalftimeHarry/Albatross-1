@@ -1,28 +1,29 @@
 <script>
-  import { writable } from 'svelte/store';
-  import escrowController from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
-  import { createEventDispatcher } from 'svelte';
+	import { writable } from 'svelte/store';
+	import escrowController from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
+	import { createEventDispatcher } from 'svelte';
 
-  export let nftID;
+	export let nftID;
 
-  export const approve = writable(true);
+	export const approve = writable(true);
 
-  const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher();
 
-  const approveSale = async (nftID) => {
-    const response = await escrowController.approveSale(nftID);
-    console.log(response);
-    return response;
-  };
+	const approveSale = async (nftID) => {
+		const response = await escrowController.approveSale(nftID);
+		console.log(response);
+		return response;
+	};
 
-  export { approveSale };
+	export { approveSale };
 
-  const handleClick = async (event) => {
-    event.preventDefault();
-    approveSale(nftID).then(() => {
-      dispatch('approve');
-    });
-  };
+	const handleClick = async (event) => {
+		event.preventDefault();
+		approveSale(nftID).then(() => {
+			dispatch('approve');
+			window.location.reload(); // Refreshes the page
+		});
+	};
 </script>
 
 <button

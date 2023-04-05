@@ -66,7 +66,6 @@ class EthersProvider {
         return await contract.purchasePrice(nftID);
         },
       getContributions: async (nftID) => {
-          console.log(`getContributions called with nftID: ${nftID}`);
           return await contract.currentDeposit(nftID);
         },
       };

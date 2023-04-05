@@ -26,6 +26,7 @@
 		event.preventDefault();
 		inspectedSale(nftID).then(() => {
 			dispatch('inspected');
+			window.location.reload(); // Refreshes the page
 		});
 	};
 </script>

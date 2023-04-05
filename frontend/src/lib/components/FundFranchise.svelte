@@ -32,6 +32,7 @@
 		const response = await escrowController.buyersDepositEarnest(nftID, $amount);
 		buyersDepositEarnest(nftID, $amount).then(() => {
 			dispatch('amount');
+			window.location.reload(); // Refreshes the page
 		});
 	};
 </script>
