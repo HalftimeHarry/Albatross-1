@@ -115,10 +115,19 @@ contract Escrow {
         deadline[_nftID] = _deadline;
     }
 
+    function _calculateGoalAmount(
+        uint256 _purchasePrice,
+        uint256 _percent
+    ) private pure returns (uint256) {
+        require(_percent >= 1 && _percent <= 100, "Invalid percentage");
+        uint256 _goalAmount = (_purchasePrice * _percent) / 100;
+        return _goalAmount;
+    }
+
     // Put Under Contract (only buyer - payable escrow)
     function depositEarnest(uint256 _nftID) public payable {
         // Set goal amount to 5
-        uint256 goal = 10000000000000000000;
+        uint256 goal = _calculateGoalAmount(purchasePrice[_nftID], 30);
         goalAmount[_nftID] = goal;
 
         require(

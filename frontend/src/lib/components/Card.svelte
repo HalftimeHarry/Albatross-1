@@ -25,15 +25,24 @@
 
 	async function getProgress(nftID) {
 		const progress = await ethersProvider?.escrowContract.getFundingProgress(nftID);
-		let deposit = progress.toString(10);
+		const deposit = parseFloat(ethers.utils.formatEther(progress));
+		const deposit_usd = deposit * usdPerEther;
+		// display deposit in USD with 2 decimal places console.log(deposit_usd.toFixed(2));
 
-		let isListed = false;
+		const contributions = await ethersProvider?.escrowContract.getContributions(nftID);
+		const total = parseFloat(ethers.utils.formatEther(contributions)) * ethToUsdRate;
+		console.log(total);
+
+		const isListed = await ethersProvider?.escrowContract.getIsListed(nftID);
 
 		const getGoal = await ethersProvider?.escrowContract.getGoalAmount(nftID);
-
-		isListed = await ethersProvider?.escrowContract.getIsListed(nftID);
-
 		const goal = parseFloat(ethers.utils.formatEther(getGoal)) * usdPerEther;
+
+		const getPrice = await ethersProvider?.escrowContract.getPurchasePrice(nftID);
+		const price = parseFloat(ethers.utils.formatEther(getPrice)) * ethToUsdRate;
+
+		const needed = price - total;
+		console.log(needed);
 
 		const getDeadline = await ethersProvider?.escrowContract.getDeadLine(nftID);
 		const deadline = new Date(getDeadline.toNumber() * 1000);
@@ -41,21 +50,35 @@
 		const currentTime = new Date();
 		const countdown = Math.floor((deadline - currentTime) / 1000);
 
-		// find the NFT in the array and update its deposit value
+		// find the NFT in the array and update its values
 		const index = nftArray.findIndex((nft) => nft.id === nftID);
-		nftArray[index].deposit = deposit;
-		nftArray[index].goal = goal - progress;
+		nftArray[index].deposit = total;
+		nftArray[index].goal = goal - deposit;
 		nftArray[index].deadline = deadline;
 		nftArray[index].countdown = countdown;
 		nftArray[index].isListed = isListed;
+		nftArray[index].price = price;
+		nftArray[index].needed = needed;
 
 		escrow_store.update((s) => ({ ...s, deposit }));
 		console.log(nftArray);
 	}
 
+	let ethToUsdRate;
+
 	onMount(async () => {
-		// add the NFT to the array
-		nftArray.push({ id: nftID, deposit: 0 });
+		const response = await fetch(
+			'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'
+		);
+		const data = await response.json();
+		ethToUsdRate = data.ethereum.usd;
+
+		const goal = await ethersProvider?.escrowContract.getGoalAmount(nftID);
+		nftArray.push({
+			id: nftID,
+			deposit: 0,
+			goal: parseFloat(ethers.utils.formatEther(goal)) * usdPerEther
+		});
 
 		await getProgress(nftID);
 	});
@@ -69,10 +92,12 @@
 >
 	<div class="mt-2 text-center font-sans text-cyan-800 font-bold">
 		{#each nftArray as nft}
-			<div>Current amount...{nft.deposit}% funded</div>
-			<ProgressBar progress={nft.deposit} />
-			Remaining amount to fund {nft.goal}<br />
-			{nft.isListed}
+			<div>Currently ${nft.deposit} USD funded</div>
+			<ProgressBar progress={(nft.deposit / nft.goal) * 100} />
+			Remaining amount ${nft.needed.toFixed(2)} USD<br />
+			{nft.isListed
+				? 'This franchise is listed for funding.'
+				: 'This item is not yet listed for sale.'}<br />
 			<p>
 				{nft.countdown > 0
 					? `${Math.floor(nft.countdown / 86400)} days, ${Math.floor(
