@@ -31,7 +31,6 @@
 
 		const contributions = await ethersProvider?.escrowContract.getContributions(nftID);
 		const total = parseFloat(ethers.utils.formatEther(contributions)) * ethToUsdRate;
-		console.log(total);
 
 		const isListed = await ethersProvider?.escrowContract.getIsListed(nftID);
 
@@ -41,8 +40,7 @@
 		const getPrice = await ethersProvider?.escrowContract.getPurchasePrice(nftID);
 		const price = parseFloat(ethers.utils.formatEther(getPrice)) * ethToUsdRate;
 
-		const needed = price - total;
-		console.log(needed);
+		const purchase_price = price - total;
 
 		const getDeadline = await ethersProvider?.escrowContract.getDeadLine(nftID);
 		const deadline = new Date(getDeadline.toNumber() * 1000);
@@ -58,7 +56,7 @@
 		nftArray[index].countdown = countdown;
 		nftArray[index].isListed = isListed;
 		nftArray[index].price = price;
-		nftArray[index].needed = needed;
+		nftArray[index].purchase_price = purchase_price;
 
 		escrow_store.update((s) => ({ ...s, deposit }));
 		console.log(nftArray);
@@ -94,10 +92,9 @@
 		{#each nftArray as nft}
 			<div>Currently ${nft.deposit} USD funded</div>
 			<ProgressBar progress={(nft.deposit / nft.goal) * 100} />
-			Remaining amount ${nft.needed.toFixed(2)} USD<br />
-			{nft.isListed
-				? 'This franchise is listed for funding.'
-				: 'This item is not yet listed for sale.'}<br />
+			Our Goal is ${nft.goal}<br />
+			Purchase Price ${nft.purchase_price.toFixed(2)} USD<br />
+			{nft.isListed ? 'Please contribute' : 'Awsome! we reached our Goal!!!'}<br />
 			<p>
 				{nft.countdown > 0
 					? `${Math.floor(nft.countdown / 86400)} days, ${Math.floor(
