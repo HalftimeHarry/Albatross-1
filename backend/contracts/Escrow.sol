@@ -126,25 +126,11 @@ contract Escrow {
 
     // Put Under Contract (only buyer - payable escrow)
     function depositEarnest(uint256 _nftID) public payable {
-        // Set goal amount to 5
+        // Set goal amount to 30% of purchase price
         uint256 goal = _calculateGoalAmount(purchasePrice[_nftID], 30);
         goalAmount[_nftID] = goal;
 
-        require(
-            currentDeposit[_nftID] < goalAmount[_nftID],
-            "Goal amount already reached"
-        );
-
-        uint256 remaining = goalAmount[_nftID] - currentDeposit[_nftID];
-        uint256 contribution;
-
-        if (msg.value > remaining) {
-            contribution = remaining;
-            uint256 excessAmount = msg.value - remaining;
-            payable(msg.sender).transfer(excessAmount);
-        } else {
-            contribution = msg.value;
-        }
+        uint256 contribution = msg.value;
 
         currentDeposit[_nftID] += contribution;
         buyerDeposit[_nftID][msg.sender] += contribution;
