@@ -49,6 +49,17 @@ class EthersProvider {
         const receipt = await tx.wait();
         return receipt;
       },
+      lenderLendFunds: async (nftID, { amount }) => {
+        const amountInWei = ethers.utils.parseUnits(amount.toString(), 'ether');
+        const tx = await contract.connect(this.signer).depositEarnest(nftID, { value: amountInWei });
+        const receipt = await tx.wait();
+        return receipt;
+      },
+      finalizeSale: async (nftID) => {
+        const tx = await contract.connect(this.signer).finalizeSale(nftID);
+        const receipt = await tx.wait();
+        return receipt;
+      },
       getInspectionStatus: async (nftID) => {
         return await contract.inspectionPassed(nftID);
       },

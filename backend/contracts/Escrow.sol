@@ -42,6 +42,16 @@ contract Escrow {
         _;
     }
 
+    modifier onlyLender() {
+    require(msg.sender == lender, "Only lender can call this function");
+    _;
+}
+
+    modifier goalReached(uint256 _nftID) {
+        require(currentDeposit[_nftID] >= goalAmount[_nftID], "Goal amount not reached");
+        _;
+    }
+
     mapping(uint256 => bool) public isListed;
     mapping(uint256 => uint256) public purchasePrice;
     mapping(uint256 => address) public buyer;
@@ -148,6 +158,20 @@ contract Escrow {
     function approveSale(uint256 _nftID) public {
         approval[_nftID][msg.sender] = true;
     }
+    // when the goal amount has been achieved allow the lender to fund the rest
+    function lenderFund(uint256 _nftID) public payable onlyLender goalReached(_nftID) {
+        uint256 remainingAmount = purchasePrice[_nftID] - currentDeposit[_nftID];
+        
+        require(msg.value <= remainingAmount, "Funding exceeds purchase price");
+        
+        uint256 refundAmount = 0;
+        if (msg.value > remainingAmount) {
+            refundAmount = msg.value - remainingAmount;
+            payable(msg.sender).transfer(refundAmount);
+        }
+        
+        currentDeposit[_nftID] += (msg.value - refundAmount);
+    }
 
     // Finalize Sale
     // -> Require inspection status (add more items here, like appraisal)
@@ -168,7 +192,6 @@ contract Escrow {
             "Funds not sufficient"
         );
 
-        uint256 excessFunds = address(this).balance - purchasePrice[_nftID];
 
         isListed[_nftID] = false;
 
@@ -178,10 +201,6 @@ contract Escrow {
         emit LogSuccess(success);
         require(success);
 
-        if (excessFunds > 0) {
-            (success, ) = payable(buyer[_nftID]).call{value: excessFunds}("");
-            require(success);
-        }
 
         IERC721(nftAddress).transferFrom(address(this), dao, _nftID);
 
