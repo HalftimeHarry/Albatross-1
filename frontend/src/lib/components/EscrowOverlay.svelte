@@ -8,6 +8,7 @@
 	import FundFranchise from '/workspace/Albatross-1/frontend/src/lib/components/FundFranchise.svelte';
 	import ApproveSale from '/workspace/Albatross-1/frontend/src/lib/components/ApproveSale.svelte';
 	import InspectionPassed from '/workspace/Albatross-1/frontend/src/lib/components/InspectionPassed.svelte';
+	import Lender from '/workspace/Albatross-1/frontend/src/lib/components/Lender.svelte';
 
 	let activeAccount = writable(null);
 
@@ -46,8 +47,6 @@
 		let role;
 		if (activeAcct.toLowerCase() === seller.toLowerCase()) {
 			role = 'seller';
-		} else if (activeAcct.toLowerCase() === lender.toLowerCase()) {
-			role = 'lender';
 		} else if (activeAcct.toLowerCase() === inspector.toLowerCase()) {
 			role = 'inspector';
 		} else if (activeAcct.toLowerCase() === dao.toLowerCase()) {
@@ -65,14 +64,24 @@
 				}
 			});
 		} else if (role !== 'buyer') {
-			const ApproveSale = (await import('./ApproveSale.svelte')).default;
-			new ApproveSale({
-				target: document.body,
-				props: {
-					nftID,
-					role
-				}
-			});
+			if (role === 'lender') {
+				const Lender = (await import('./Lender.svelte')).default;
+				new Lender({
+					target: document.body,
+					props: {
+						nftID
+					}
+				});
+			} else {
+				const ApproveSale = (await import('./ApproveSale.svelte')).default;
+				new ApproveSale({
+					target: document.body,
+					props: {
+						nftID,
+						role
+					}
+				});
+			}
 		} else {
 			const FundFranchise = (await import('./FundFranchise.svelte')).default;
 			new FundFranchise({
@@ -120,19 +129,19 @@
 							on:close={() => isOverlayOpen.set(false)}
 							on:approve={() => isOverlayOpen.set(false)}
 						/>
-					{:else if activeAcct.toLowerCase() === lender.toLowerCase()}
-						<div class="mt-4 mr-3">Lender</div>
-						<ApproveSale
-							{nftID}
-							on:close={() => isOverlayOpen.set(false)}
-							on:approve={() => isOverlayOpen.set(false)}
-						/>
 					{:else if activeAcct.toLowerCase() === dao.toLowerCase()}
 						<div class="mt-4 mr-3">DAO</div>
 						<ApproveSale
 							{nftID}
 							on:close={() => isOverlayOpen.set(false)}
 							on:approve={() => isOverlayOpen.set(false)}
+						/>
+					{:else if activeAcct.toLowerCase() === lender.toLowerCase()}
+						<div class="mt-4 mr-3">Lender</div>
+						<Lender
+							{nftID}
+							on:close={() => isOverlayOpen.set(false)}
+							on:fund={() => isOverlayOpen.set(false)}
 						/>
 					{:else if activeAcct.toLowerCase() === inspector.toLowerCase()}
 						<InspectionPassed
