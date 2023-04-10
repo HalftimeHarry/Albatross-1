@@ -1,7 +1,29 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import escrowController from '/workspace/Albatross-1/frontend/src/lib/controllers/EscrowController.js';
-	import { ethers } from 'ethers';
+	import EthersProvider from '/workspace/Albatross-1/frontend/src/lib/providers/ethersProvider.js';
+	import { onMount } from 'svelte';
+
+	const ethersProvider = new EthersProvider();
+
+	onMount(async () => {
+		await escrowController.init(nftID);
+	});
+
+	const { escrow_store } = escrowController;
+
+	$: ({ price, contributions } = $escrow_store);
+
+	let displayAmount;
+
+	$: {
+		if (price && contributions && price >= contributions) {
+			displayAmount = (price - contributions) / 1e18;
+			console.log(displayAmount);
+		} else {
+			displayAmount = null;
+		}
+	}
 
 	export let nftID;
 
@@ -11,22 +33,19 @@
 		try {
 			await escrowController.init(nftID);
 
-			// Call approveSale function
-			const approveResponse = await escrowController.approveSale(nftID);
-			console.log('approveSale response:', approveResponse);
-
-			// Call getPurchasePrice function
-			const purchasePrice = await escrowController.getPurchasePrice(nftID);
-			console.log('getPurchasePrice response:', purchasePrice);
-
-			if (!purchasePrice) {
+			if (!price) {
 				throw new Error('purchasePrice is undefined or null');
 			}
 
-			// Call lenderFund function
-			const weiAmount = ethers.utils.parseUnits(purchasePrice.toString(), 'ether');
-			const fundResponse = await escrowController.lenderFund(nftID, weiAmount);
-			console.log('lenderFund response:', fundResponse);
+			const amountInEther = (price - contributions) / 1e18;
+
+			// Call buyersDepositEarnest function to do the lendResponse
+			const lendResponse = await escrowController.buyersDepositEarnest(nftID, amountInEther);
+			escrowController.buyersDepositEarnest(nftID, amountInEther).then(async () => {
+				// Call approveSale function
+				const approveResponse = await escrowController.approveSale(nftID);
+				console.log('approveSale response:', approveResponse);
+			});
 
 			// Call finalizeSale function
 			const finalizeResponse = await escrowController.finalizeSale(nftID);
@@ -46,4 +65,5 @@
 	on:click={() => handleLenderActions(nftID)}
 >
 	Approve, Fund & Finalize Sale
+	{displayAmount}
 </button>

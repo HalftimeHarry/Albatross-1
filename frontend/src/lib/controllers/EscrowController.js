@@ -32,7 +32,7 @@ class EscrowController {
     this.#daoAddress();
     this.#sellerAddress();
     this.getPurchasePrice(nftID);
-    this.getContributions();
+    this.getContributions(nftID);
     this.getGoalAmount();
     this.getDeadLine();
   }
@@ -48,13 +48,6 @@ class EscrowController {
     } catch (error) {
       console.error("Error in buyersDepositEarnest:", error);
     }
-  }
-
-  async lenderFund(nftID, amount) {
-    const weiAmount = this.ethersProvider.utils.parseUnits(amount.toString(), "ether");
-    const tx = await this.ethersProvider.depositEarnest(nftID, { value: weiAmount });
-    const transactionReceipt = await tx.wait();
-    return transactionReceipt;
   }
 
   async finalizeSale(nftID) {
