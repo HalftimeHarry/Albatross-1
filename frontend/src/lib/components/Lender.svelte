@@ -14,17 +14,6 @@
 
 	$: ({ price, contributions } = $escrow_store);
 
-	let displayAmount;
-
-	$: {
-		if (price && contributions && price >= contributions) {
-			displayAmount = (price - contributions) / 1e18;
-			console.log(displayAmount);
-		} else {
-			displayAmount = null;
-		}
-	}
-
 	export let nftID;
 
 	const dispatch = createEventDispatcher();
@@ -37,22 +26,20 @@
 				throw new Error('purchasePrice is undefined or null');
 			}
 
+			const approveResponse = await escrowController.approveSale(nftID);
+			console.log('approveResponse:', approveResponse);
+
 			const amountInEther = (price - contributions) / 1e18;
+			console.log('amountInEther:', amountInEther);
 
-			// Call buyersDepositEarnest function to do the lendResponse
 			const lendResponse = await escrowController.buyersDepositEarnest(nftID, amountInEther);
-			escrowController.buyersDepositEarnest(nftID, amountInEther).then(async () => {
-				// Call approveSale function
-				const approveResponse = await escrowController.approveSale(nftID);
-				console.log('approveSale response:', approveResponse);
-			});
+			console.log('lendResponse:', lendResponse);
 
-			// Call finalizeSale function
 			const finalizeResponse = await escrowController.finalizeSale(nftID);
-			console.log('finalizeSale response:', finalizeResponse);
+			console.log('finalizeResponse:', finalizeResponse);
 
-			dispatch('actionCompleted');
-			window.location.reload(); // Refreshes the page
+			dispatch('finalize');
+			window.location.reload();
 		} catch (error) {
 			console.error('Error in handleLenderActions:', error);
 		}
@@ -65,5 +52,4 @@
 	on:click={() => handleLenderActions(nftID)}
 >
 	Approve, Fund & Finalize Sale
-	{displayAmount}
 </button>
